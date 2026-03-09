@@ -14,6 +14,12 @@ import VideoVerificationPage from './pages/VideoVerificationPage';
 import Dashboard from './pages/Dashboard';
 import AdminLogin from './pages/AdminLogin';
 import ResidentDirectory from './pages/ResidentDirectory';
+import VisitorLogs from './pages/VisitorLogs';
+import SecurityGuards from './pages/SecurityGuards';
+import EntryLogs from './pages/EntryLogs';
+import Reports from './pages/Reports';
+import SecurityAlerts from './pages/SecurityAlerts';
+import SystemSettings from './pages/SystemSettings';
 
 function KioskHeader() {
   const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
@@ -68,6 +74,12 @@ function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/directory" element={<ResidentDirectory />} />
+          <Route path="/visitor-logs" element={<VisitorLogs />} />
+          <Route path="/alerts" element={<SecurityAlerts />} />
+          <Route path="/guards" element={<SecurityGuards />} />
+          <Route path="/entry-logs" element={<EntryLogs />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<SystemSettings />} />
         </Routes>
       </NotificationProvider>
     </Router>

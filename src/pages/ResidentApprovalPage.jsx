@@ -127,7 +127,7 @@ export default function ResidentApprovalPage() {
                     ) : (
                         <>
                             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'inline-block', background: '#fee2e2', color: '#dc2626', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', background: '#fee2e2', color: '#dc2626', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: 600, alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                     <Clock size={16} /> Action Required: Visitor Waiting
                                 </div>
                             </div>
