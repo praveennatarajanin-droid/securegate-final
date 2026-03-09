@@ -1,0 +1,590 @@
+/* ============================================
+   SecureGate — Approval Waiting Screen CSS
+   Merged: Camera + Waiting + Outcome states
+   ============================================ */
+
+/* ─── Page wrapper ─── */
+.waiting-page {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 1rem 1.5rem;
+    box-sizing: border-box;
+}
+
+@media (min-height: 750px) {
+    .waiting-page {
+        align-items: center;
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* ─── Card ─── */
+.waiting-card {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 1.375rem 1.5rem 1.75rem;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 8px 20px rgba(47, 107, 255, 0.06);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ─── Waiting badge ─── */
+.waiting-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.875rem;
+    background: rgba(245, 158, 11, 0.08);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    width: fit-content;
+    margin: 0 auto;
+    letter-spacing: 0.02em;
+}
+
+.badge-spinner {
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─── Camera section ─── */
+.camera-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.camera-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.camera-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    /* mirror for selfie effect */
+}
+
+/* LIVE badge */
+.live-badge {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.625rem;
+    background: rgba(239, 68, 68, 0.92);
+    backdrop-filter: blur(6px);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.08em;
+    z-index: 10;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background: white;
+    border-radius: 50%;
+    display: inline-block;
+    animation: livePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Corner guides */
+.corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-color: rgba(255, 255, 255, 0.6);
+    border-style: solid;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.corner.tl {
+    top: 8px;
+    left: 8px;
+    border-width: 2px 0 0 2px;
+    border-radius: 2px 0 0 0;
+}
+
+.corner.tr {
+    top: 8px;
+    right: 8px;
+    border-width: 2px 2px 0 0;
+    border-radius: 0 2px 0 0;
+}
+
+.corner.bl {
+    bottom: 8px;
+    left: 8px;
+    border-width: 0 0 2px 2px;
+    border-radius: 0 0 0 2px;
+}
+
+.corner.br {
+    bottom: 8px;
+    right: 8px;
+    border-width: 0 2px 2px 0;
+    border-radius: 0 0 2px 0;
+}
+
+/* Camera error state */
+.camera-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 1rem;
+}
+
+.camera-error-sub {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* Camera instruction */
+.camera-instruction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ─── Waiting status ─── */
+.waiting-status {
+    text-align: center;
+}
+
+.waiting-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.01em;
+}
+
+.waiting-desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.waiting-desc strong {
+    color: #1f2937;
+}
+
+/* ─── Instructions ─── */
+.waiting-instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.8rem;
+    color: #374151;
+    line-height: 1.45;
+}
+
+.instruction-num {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    background: #2F6BFF;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ─── Meta chips ─── */
+.waiting-meta {
+    display: flex;
+    gap: 0.625rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.meta-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+
+/* ════════════════════════════════════
+   OUTCOME CARDS
+   ════════════════════════════════════ */
+
+.outcome-card {
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    padding: 2.5rem 2rem 2.25rem;
+}
+
+/* ─── Approved ─── */
+.approved-card {
+    border-color: rgba(16, 185, 129, 0.25);
+    background: linear-gradient(135deg, #f0fff8 0%, #ecfdf5 100%);
+}
+
+/* ─── Denied ─── */
+.denied-card {
+    border-color: rgba(239, 68, 68, 0.2);
+    background: linear-gradient(135deg, #fff8f8 0%, #fef2f2 100%);
+}
+
+/* ─── Outcome icon wrapper ─── */
+.outcome-icon-wrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.outcome-icon-wrap.approved {
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 50%;
+}
+
+.outcome-icon-wrap.denied {
+    background: rgba(239, 68, 68, 0.08);
+    border-radius: 50%;
+}
+
+.outcome-icon {
+    position: relative;
+    z-index: 2;
+    animation: bounceIn 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Pulse rings for approved */
+.pulse-ring {
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid rgba(16, 185, 129, 0.4);
+    animation: pulseOut 2s ease-out infinite;
+}
+
+.pulse-ring.delay {
+    animation-delay: 1s;
+}
+
+@keyframes pulseOut {
+    0% {
+        transform: scale(0.7);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+/* ─── Outcome titles ─── */
+.outcome-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+}
+
+.approved-title {
+    color: #065f46;
+}
+
+.denied-title {
+    color: #991b1b;
+}
+
+.outcome-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+    max-width: 280px;
+}
+
+/* ─── Gate animation ─── */
+.gate-animation {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    height: 70px;
+    background: #e8f5e9;
+    border: 1.5px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+}
+
+.gate-left,
+.gate-right {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: openGate 1.5s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    border-radius: 8px;
+}
+
+.gate-left {
+    left: 0;
+    transform-origin: left;
+    animation-name: openGateLeft;
+}
+
+.gate-right {
+    right: 0;
+    transform-origin: right;
+    animation-name: openGateRight;
+}
+
+@keyframes openGateLeft {
+    0% {
+        transform: scaleX(1);
+    }
+
+    100% {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes openGateRight {
+    0% {
+        transform: scaleX(1);
+    }
+
+    100% {
+        transform: scaleX(0);
+    }
+}
+
+.gate-label {
+    position: relative;
+    z-index: 5;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #065f46;
+    letter-spacing: 0.08em;
+    animation: gateTextFade 0.5s 0.8s forwards;
+    opacity: 0;
+}
+
+@keyframes gateTextFade {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ─── Outcome info box ─── */
+.outcome-info-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.125rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    max-width: 320px;
+}
+
+.approved-info {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #065f46;
+}
+
+.denied-info {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    color: #7f1d1d;
+}
+
+/* ─── Redirect text ─── */
+.outcome-redirect {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0.75rem 0 0;
+}
+
+
+/* ════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════ */
+
+@media (max-width: 400px) {
+    .waiting-card {
+        padding: 1.125rem 1.125rem 1.5rem;
+        border-radius: 14px;
+        gap: 0.875rem;
+    }
+
+    .waiting-title {
+        font-size: 1.05rem;
+    }
+
+    .outcome-card {
+        padding: 2rem 1.5rem 2rem;
+    }
+
+    .outcome-title {
+        font-size: 1.5rem;
+    }
+
+    .gate-animation {
+        max-width: 240px;
+        height: 60px;
+    }
+}
+
+@media (max-height: 650px) {
+    .waiting-page {
+        align-items: flex-start;
+        padding: 0.5rem 0.75rem 1rem;
+    }
+
+    .waiting-card {
+        gap: 0.75rem;
+        padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .camera-frame {
+        aspect-ratio: 16 / 9;
+    }
+
+    .waiting-title {
+        font-size: 1rem;
+    }
+
+    .waiting-instructions {
+        padding: 0.625rem 0.875rem;
+        gap: 0.45rem;
+    }
+
+    .outcome-card {
+        padding: 1.75rem 1.5rem;
+    }
+
+    .outcome-icon-wrap {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
+    }
+
+    .outcome-title {
+        font-size: 1.5rem;
+    }
+}

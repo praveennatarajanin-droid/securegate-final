@@ -1,270 +1,288 @@
-/* ============================================
-   SecureGate — Visitor Registration Form CSS
-   Complete rewrite for correct layout & icons
-   ============================================ */
+/* ================================================================
+   SecureGate — Visitor Registration Form  (v5 — flex-row icons)
+   All input layout uses FLEX ROW — icon is a flex sibling,
+   NOT inside the <input>. This eliminates ALL overlap issues.
+   ================================================================ */
 
-/* Page wrapper — allows scrolling inside kiosk */
+/* ─── Page wrapper ─── */
 .registration-page {
     width: 100%;
     flex: 1;
+    min-height: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
     overflow-y: auto;
-    padding: 1.5rem 1rem 3rem;
+    overflow-x: hidden;
+    padding: 1rem 1rem 2rem;
     box-sizing: border-box;
 }
 
-/* Center card container */
-.registration-container {
+@media (min-height: 700px) {
+    .registration-page {
+        align-items: center;
+    }
+}
+
+/* ─── Card ─── */
+.sg-card {
     width: 100%;
-    max-width: 460px;
+    max-width: 440px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 1.625rem 1.875rem 2rem;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 8px 24px rgba(47, 107, 255, 0.07);
+    box-sizing: border-box;
     margin: 0 auto;
 }
 
-/* Glass card */
-.glass-card {
-    background: #ffffff;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 20px;
-    padding: 2rem 2rem 2.5rem;
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 10px 25px -5px rgba(47, 107, 255, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Kiosk background tweak for register page */
+/* Kiosk background */
 .kiosk-container {
-    background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 50%, #f4f0ff 100%) !important;
+    background: linear-gradient(135deg, #eef2ff 0%, #e8eeff 60%, #f0f4ff 100%) !important;
 }
 
-/* ─── Trust Badge ─── */
-.trust-badge {
+/* ─── Trust badge ─── */
+.sg-trust {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    padding: 0.4rem 1rem;
-    background: rgba(16, 185, 129, 0.08);
+    gap: 0.35rem;
+    padding: 0.3rem 0.875rem;
+    background: rgba(16, 185, 129, 0.07);
     color: #065f46;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 40px;
+    font-size: 0.69rem;
     font-weight: 600;
     width: fit-content;
-    margin: 0 auto 1.5rem;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    letter-spacing: 0.01em;
+    margin: 0 auto 1.25rem;
+    letter-spacing: 0.02em;
 }
 
-/* ─── Form Header ─── */
-.form-header {
+/* ─── Header ─── */
+.sg-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.375rem;
 }
 
-.back-btn {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
+.sg-back {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
     border-radius: 50%;
-    border: 1px solid #e2e8f0;
+    border: 1.5px solid #e2e8f0;
     background: #f8fafc;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
     color: #64748b;
+    transition: all 0.18s ease;
     flex-shrink: 0;
+    padding: 0;
 }
 
-.back-btn:hover {
+.sg-back:hover {
     background: #eff6ff;
-    border-color: #bfdbfe;
+    border-color: #93c5fd;
     color: #2563eb;
     transform: translateX(-2px);
 }
 
-.header-title {
+.sg-title {
     flex: 1;
     text-align: center;
-    font-size: 1.375rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     margin: 0;
     letter-spacing: -0.02em;
 }
 
-/* ─── Input Wrapper ─── */
-.input-wrapper {
+.sg-spacer {
+    width: 36px;
+    flex-shrink: 0;
+}
+
+
+/* ══════════════════════════════════════════════
+   FIELD GROUP — label + input row + error
+   ══════════════════════════════════════════════ */
+
+.sg-field {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
-    margin-bottom: 1.25rem;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Label above input */
-.input-label {
-    font-size: 0.8125rem;
+.sg-label {
+    font-size: 0.795rem;
     font-weight: 600;
     color: #374151;
-    padding-left: 0.25rem;
-    transition: color 0.2s ease;
+    margin-left: 2px;
     line-height: 1;
+    transition: color 0.18s;
 }
 
-.input-wrapper:focus-within .input-label {
-    color: var(--color-primary, #2F6BFF);
+/* Label turns blue when field is focused */
+.sg-field:focus-within .sg-label {
+    color: #2563eb;
 }
 
-/* ─── Input field wrapper (for icon positioning) ─── */
-.input-field-wrapper {
-    position: relative;
+
+/* ══════════════════════════════════════════════
+   THE CORE FIX: sg-input-row (FLEX ROW)
+
+   Structure:
+   .sg-input-row
+     ├── .sg-icon     ← left icon (flex child, fixed width)
+     ├── .sg-input    ← input/select (flex: 1, NO left padding issue)
+     └── .sg-status   ← right icon (flex child, fixed width)
+
+   The border/background sit on the WRAPPER, not the input.
+   The input has border:none and background:transparent.
+   This guarantees zero overlap — the icon is NEVER inside the input.
+   ══════════════════════════════════════════════ */
+
+.sg-input-row {
     display: flex;
     align-items: center;
-}
-
-/* Icon — left side, vertically centered using flexbox */
-.input-icon {
-    position: absolute;
-    left: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    pointer-events: none;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    transition: color 0.2s ease;
-}
-
-.input-field-wrapper:focus-within .input-icon {
-    color: var(--color-primary, #2F6BFF);
-}
-
-/* Status icon — right side */
-.input-status {
-    position: absolute;
-    right: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes popIn {
-    from {
-        transform: translateY(-50%) scale(0.6);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(-50%) scale(1);
-        opacity: 1;
-    }
-}
-
-/* ─── Input field ─── */
-.input-field {
-    width: 100%;
     height: 50px;
-    /* Left padding = icon width (20px) + left offset (13px) + gap (10px) = 43px */
-    padding: 0 44px 0 43px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #d1d5db;
     border-radius: 10px;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    color: #1f2937;
-    background: #fafbfc;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    background: #f9fafb;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Focus glow — triggered when any child (input/select) is focused */
+.sg-input-row:focus-within {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Valid state */
+.sg-input-row.field-valid {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.sg-input-row.field-valid:focus-within {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+/* Error state */
+.sg-input-row.field-error {
+    border-color: #f87171;
+    background: #fff5f5;
+}
+
+.sg-input-row.field-error:focus-within {
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+}
+
+/* ── Left icon slot ── */
+.sg-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    /* fixed: 12px gap left + 20px icon + 12px gap right */
+    flex-shrink: 0;
+    color: #9ca3af;
+    transition: color 0.18s;
+    pointer-events: none;
+    height: 100%;
+}
+
+.sg-input-row:focus-within .sg-icon {
+    color: #3b82f6;
+}
+
+.sg-input-row.field-valid .sg-icon {
+    color: #10b981;
+}
+
+.sg-input-row.field-error .sg-icon {
+    color: #f87171;
+}
+
+/* ── Core input ── 
+   No padding-left needed — the flex layout handles spacing.
+   No border, no background — the wrapper handles those.         */
+.sg-input {
+    flex: 1;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
     outline: none;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111827;
+    font-family: inherit;
+    min-width: 0;
     -webkit-appearance: none;
     appearance: none;
 }
 
-.input-field::placeholder {
-    color: #b0bac5;
+.sg-input::placeholder {
+    color: #9ca3af;
     font-weight: 400;
+    font-size: 0.875rem;
 }
 
-.input-field:focus {
-    border-color: var(--color-primary, #2F6BFF);
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.1);
-}
-
-.input-field.valid {
-    border-color: #10b981;
-    background: #f0fff8;
-}
-
-.input-field.valid:focus {
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
-}
-
-.input-field.invalid {
-    border-color: #ef4444;
-    background: #fff8f8;
-}
-
-.input-field.invalid:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
-}
-
-/* Select specific overrides */
-select.input-field {
+/* Select — needs extra padding-right for native dropdown arrow (hidden on most) */
+.sg-select {
     cursor: pointer;
-    /* Extra right padding for arrow */
-    padding-right: 44px;
+    padding-right: 4px;
 }
 
-/* Custom select arrow */
-.select-arrow {
-    position: absolute;
-    right: 13px;
-    top: 50%;
-    transform: translateY(-50%);
+/* ── Right status / chevron slot ── */
+.sg-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    flex-shrink: 0;
+    height: 100%;
     pointer-events: none;
-    color: #94a3b8;
-    z-index: 2;
-    transition: transform 0.25s ease, color 0.2s ease;
 }
 
-.input-field-wrapper:focus-within .select-arrow {
-    transform: translateY(-50%) rotate(180deg);
-    color: var(--color-primary, #2F6BFF);
+.sg-chevron {
+    color: #9ca3af;
+    transition: transform 0.2s ease;
 }
 
-/* Hide arrow when status icon is showing */
-.input-field.valid~.select-arrow,
-.input-field.invalid~.select-arrow {
-    display: none;
+.sg-input-row:focus-within .sg-chevron {
+    transform: rotate(180deg);
+    color: #3b82f6;
 }
 
-/* ─── Error/Success message ─── */
-.error-message {
+/* ── Error message ── */
+.sg-error {
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    font-size: 0.75rem;
+    font-size: 0.73rem;
+    font-weight: 500;
     color: #ef4444;
-    padding-left: 0.25rem;
-    animation: slideDown 0.2s ease-out;
-    line-height: 1.2;
+    margin-left: 2px;
+    line-height: 1.3;
+    animation: sgSlideDown 0.16s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes sgSlideDown {
     from {
         transform: translateY(-4px);
         opacity: 0;
@@ -276,54 +294,65 @@ select.input-field {
     }
 }
 
-/* ─── Spinner animation ─── */
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
 
-.spinner {
-    animation: spin 0.8s linear infinite;
-}
+/* ══════════════════════════════════════════════
+   PHOTO CAPTURE
+   ══════════════════════════════════════════════ */
 
-/* ─── Photo Capture ─── */
-.photo-capture {
-    width: 100%;
-    border: 1.5px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 1.25rem 1rem;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #f8fafc;
+.sg-photo {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 0.5rem;
-    color: #64748b;
+    gap: 0.875rem;
+    width: 100%;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
     box-sizing: border-box;
+    min-height: 60px;
+    margin-bottom: 1.125rem;
 }
 
-.photo-capture:hover {
-    border-color: var(--color-primary, #2F6BFF);
-    background: #f0f4ff;
+.sg-photo:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateY(-1px);
 }
 
-.photo-preview {
-    width: 80px;
-    height: 80px;
+.sg-photo--filled {
+    border-style: solid;
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.sg-photo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    border: 1.5px solid #bfdbfe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sg-photo-preview {
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--color-primary, #2F6BFF);
-    box-shadow: 0 4px 8px rgba(47, 107, 255, 0.2);
-    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    border: 2px solid #2563eb;
+    flex-shrink: 0;
+    animation: sgScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes scaleIn {
+@keyframes sgScaleIn {
     from {
-        transform: scale(0.8);
+        transform: scale(0.7);
         opacity: 0;
     }
 
@@ -333,105 +362,146 @@ select.input-field {
     }
 }
 
-/* ─── Submit Button ─── */
-.submit-btn {
-    width: 100%;
-    height: 52px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #2F6BFF 0%, #1E4FCC 100%);
-    color: white;
-    font-size: 1rem;
+.sg-photo-title {
+    font-size: 0.83rem;
     font-weight: 600;
-    cursor: pointer;
+    color: #374151;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
+.sg-photo-sub {
+    font-size: 0.72rem;
+    color: #6b7280;
+    line-height: 1.3;
+}
+
+
+/* ══════════════════════════════════════════════
+   SUBMIT BUTTON
+   ══════════════════════════════════════════════ */
+
+.sg-submit {
+    width: 100%;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.625rem;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(47, 107, 255, 0.3);
+    gap: 0.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
     letter-spacing: 0.01em;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
+
+    /* Active: vivid blue gradient */
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.38);
 }
 
-.submit-btn::after {
+/* Sheen sweep animation */
+.sg-submit::after {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 60%;
+    left: -120%;
+    width: 70%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
     transform: skewX(-20deg);
-    animation: shine 2.5s ease infinite;
+    animation: sgSheen 3s ease infinite;
+    pointer-events: none;
 }
 
-@keyframes shine {
+@keyframes sgSheen {
     0% {
-        left: -100%;
+        left: -120%;
     }
 
-    30% {
-        left: 200%;
+    35% {
+        left: 220%;
     }
 
     100% {
-        left: 200%;
+        left: 220%;
     }
 }
 
-.submit-btn:hover:not(:disabled) {
+.sg-submit:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(47, 107, 255, 0.4);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
-.submit-btn:active:not(:disabled) {
+.sg-submit:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(47, 107, 255, 0.3);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
 }
 
-.submit-btn:disabled,
-.submit-btn.disabled {
-    background: #94a3b8;
+/* Disabled — form incomplete */
+.sg-submit:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
     box-shadow: none;
     cursor: not-allowed;
-    opacity: 0.8;
     transform: none;
 }
 
-.submit-btn:disabled::after,
-.submit-btn.disabled::after {
+.sg-submit:disabled::after {
     display: none;
 }
 
-.submit-btn.loading {
-    background: #64748b;
+/* Loading state — keep blue, slightly dimmed */
+.sg-submit[data-loading="true"] {
+    opacity: 0.85;
     cursor: wait;
-    box-shadow: none;
-    transform: none;
 }
 
-.submit-btn.loading::after {
-    display: none;
+/* Spinner */
+@keyframes sgSpin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-/* ─── Success / Approval indicator ─── */
-.approval-indicator {
+.sg-spin {
+    animation: sgSpin 0.85s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Legal text ── */
+.sg-legal {
+    text-align: center;
+    font-size: 0.69rem;
+    color: #94a3b8;
+    margin-top: 0.75rem;
+    line-height: 1.5;
+}
+
+
+/* ══════════════════════════════════════════════
+   SUCCESS SCREEN
+   ══════════════════════════════════════════════ */
+
+.sg-card--success {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
     text-align: center;
-    animation: fadeUp 0.4s ease-out;
+    padding: 3rem 2rem;
+    animation: sgFadeUp 0.4s ease-out;
 }
 
-@keyframes fadeUp {
+@keyframes sgFadeUp {
     from {
-        transform: translateY(20px);
+        transform: translateY(16px);
         opacity: 0;
     }
 
@@ -441,98 +511,219 @@ select.input-field {
     }
 }
 
-.ripple-circle {
+.sg-success-ring {
+    position: relative;
     width: 88px;
     height: 88px;
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(16, 185, 129, 0.08);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.5rem;
-    position: relative;
+    margin-bottom: 1.375rem;
 }
 
-.ripple-circle::before,
-.ripple-circle::after {
+.sg-success-ring::before,
+.sg-success-ring::after {
     content: '';
     position: absolute;
-    inset: -16px;
+    inset: -14px;
     border-radius: 50%;
-    border: 1.5px solid #10b981;
-    animation: rippleOut 2s ease-out infinite;
+    border: 1.5px solid rgba(16, 185, 129, 0.4);
+    animation: sgRipple 2.2s ease-out infinite;
     opacity: 0;
 }
 
-.ripple-circle::after {
-    animation-delay: 1s;
+.sg-success-ring::after {
+    animation-delay: 1.1s;
 }
 
-@keyframes rippleOut {
+@keyframes sgRipple {
     0% {
-        transform: scale(0.6);
-        opacity: 0.6;
+        transform: scale(0.65);
+        opacity: 0.5;
     }
 
     100% {
-        transform: scale(1.2);
+        transform: scale(1.3);
         opacity: 0;
     }
 }
 
-/* ─── Responsive ─── */
-
-/* Mobile: ≤ 480px */
-@media (max-width: 480px) {
-    .registration-page {
-        padding: 0.75rem 0.75rem 2rem;
-        align-items: flex-start;
-    }
-
-    .glass-card {
-        border-radius: 16px;
-        padding: 1.5rem 1.25rem 2rem;
-    }
-
-    .header-title {
-        font-size: 1.2rem;
-    }
-
-    .input-field {
-        height: 48px;
-        font-size: 0.9rem;
-    }
-
-    .submit-btn {
-        height: 50px;
-        font-size: 0.95rem;
-    }
+.sg-success-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #065f46;
+    margin: 0 0 0.625rem;
 }
 
-/* At very small screens (≤ 360px) */
+.sg-success-desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+    max-width: 280px;
+}
+
+.sg-success-desc strong {
+    color: #111827;
+}
+
+.sg-success-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: rgba(16, 185, 129, 0.08);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════ */
+
+/* ≤ 360px */
 @media (max-width: 360px) {
     .registration-page {
-        padding: 0.5rem 0.5rem 1.5rem;
+        padding: 0.5rem 0.625rem 1.5rem;
     }
 
-    .glass-card {
-        padding: 1.25rem 1rem 1.75rem;
-        border-radius: 12px;
+    .sg-card {
+        padding: 1.25rem 1.125rem 1.5rem;
+        border-radius: 16px;
+    }
+
+    .sg-input-row {
+        height: 46px;
+    }
+
+    .sg-submit {
+        height: 46px;
+        font-size: 0.875rem;
+    }
+
+    .sg-trust {
+        margin-bottom: 1rem;
+    }
+
+    .sg-field {
+        margin-bottom: 0.75rem;
     }
 }
 
-/* Tablet: 481px – 768px */
+/* 361-480px */
+@media (min-width: 361px) and (max-width: 480px) {
+    .registration-page {
+        padding: 0.75rem 0.875rem 1.5rem;
+    }
+
+    .sg-card {
+        padding: 1.375rem 1.5rem 1.75rem;
+        border-radius: 18px;
+    }
+
+    .sg-input-row {
+        height: 48px;
+    }
+}
+
+/* Short viewport ≤ 650px height */
+@media (max-height: 650px) {
+    .registration-page {
+        align-items: flex-start;
+        padding: 0.5rem 1rem 1rem;
+    }
+
+    .sg-card {
+        padding: 1rem 1.5rem 1.25rem;
+    }
+
+    .sg-trust {
+        margin-bottom: 0.75rem;
+    }
+
+    .sg-header {
+        margin-bottom: 0.875rem;
+    }
+
+    .sg-field {
+        margin-bottom: 0.7rem;
+    }
+
+    .sg-input-row {
+        height: 44px;
+    }
+
+    .sg-photo {
+        padding: 0.625rem 1rem;
+        min-height: 52px;
+        margin-bottom: 0.875rem;
+    }
+
+    .sg-submit {
+        height: 46px;
+    }
+}
+
+/* Tablet 481-768px */
 @media (min-width: 481px) and (max-width: 768px) {
     .registration-page {
-        padding: 1.5rem 1.5rem 3rem;
-        align-items: center;
+        padding: 1.25rem 1.5rem 2rem;
+    }
+
+    .sg-card {
+        max-width: 460px;
     }
 }
 
-/* Desktop: ≥ 769px */
+/* Desktop ≥ 769px */
 @media (min-width: 769px) {
     .registration-page {
-        align-items: center;
-        padding: 2rem 1rem 3rem;
+        padding: 1.5rem 2rem 2rem;
     }
+
+    .sg-card {
+        max-width: 460px;
+        padding: 1.875rem 2.125rem 2.25rem;
+    }
+}
+
+/* Keep old classes for backward compat with WelcomeScreen */
+.registration-container {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.glass-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 1.625rem 1.875rem 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(47, 107, 255, 0.07);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.875rem;
+    background: rgba(16, 185, 129, 0.07);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 40px;
+    font-size: 0.69rem;
+    font-weight: 600;
+    width: fit-content;
+    margin: 0 auto 1.25rem;
+    letter-spacing: 0.02em;
 }

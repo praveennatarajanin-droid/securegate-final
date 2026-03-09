@@ -69,13 +69,12 @@ body {
   align-items: center;
 }
 
-/* Kiosk Specific constraints */
+/* Kiosk Specific constraints — padding handled per-page */
 .kiosk-container {
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 2rem;
   overflow: hidden;
 }
 
@@ -86,12 +85,6 @@ body {
   display: flex;
   overflow: hidden;
   background: var(--color-background);
-}
-
-@media (min-width: 1024px) {
-  .kiosk-container {
-    padding: 3rem;
-  }
 }
 
 .card {
@@ -249,12 +242,11 @@ select:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+  padding: 0.875rem 1.5rem;
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .kiosk-logo {

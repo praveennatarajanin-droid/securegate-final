@@ -10,7 +10,7 @@ import ResidentApprovalPage from './pages/ResidentApprovalPage';
 import AuthScreen from './pages/AuthScreen';
 import GateOpenScreen from './pages/GateOpenScreen';
 import ExitScreen from './pages/ExitScreen';
-import VideoVerificationPage from './pages/VideoVerificationPage';
+import VideoVerificationPage from './pages/VideoVerificationPage'; // legacy demo — not in visitor flow
 import Dashboard from './pages/Dashboard';
 import AdminLogin from './pages/AdminLogin';
 import ResidentDirectory from './pages/ResidentDirectory';
@@ -45,9 +45,11 @@ function KioskHeader() {
 // Layout for the Gate Kiosk
 function KioskLayout({ children }) {
   return (
-    <div className="kiosk-container">
+    <div className="kiosk-container" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <KioskHeader />
-      {children}
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -67,7 +69,7 @@ function App() {
           {/* External Resident Route - doesn't need kiosk container layout */}
           <Route path="/resident/approve/:id" element={<ResidentApprovalPage />} />
 
-          {/* Demo Verification Page Route */}
+          {/* Legacy demo route — not part of the main visitor flow */}
           <Route path="/video-verification" element={<VideoVerificationPage />} />
 
           {/* Admin Routes */}
