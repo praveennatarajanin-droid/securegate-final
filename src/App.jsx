@@ -12,6 +12,8 @@ import GateOpenScreen from './pages/GateOpenScreen';
 import ExitScreen from './pages/ExitScreen';
 import VideoVerificationPage from './pages/VideoVerificationPage';
 import Dashboard from './pages/Dashboard';
+import AdminLogin from './pages/AdminLogin';
+import ResidentDirectory from './pages/ResidentDirectory';
 
 function KioskHeader() {
   const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
@@ -62,8 +64,10 @@ function App() {
           {/* Demo Verification Page Route */}
           <Route path="/video-verification" element={<VideoVerificationPage />} />
 
-          {/* Admin Dashboard */}
+          {/* Admin Routes */}
+          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/directory" element={<ResidentDirectory />} />
         </Routes>
       </NotificationProvider>
     </Router>
