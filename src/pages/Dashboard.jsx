@@ -4,6 +4,7 @@ import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
+import { apiService } from '../services/apiService';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
@@ -16,8 +17,7 @@ export default function Dashboard() {
     React.useEffect(() => {
         const fetchVisitors = async () => {
             try {
-                const res = await fetch('/api/visitors');
-                const data = await res.json();
+                const data = await apiService.getAllVisitors();
                 if (data.success) {
                     setVisitors(data.data);
 

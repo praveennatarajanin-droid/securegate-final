@@ -3,23 +3,46 @@
    Falls back gracefully if the server is not running.
    ================================================================ */
 
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 async function request(method, path, body = null) {
     try {
+        const url = `${BASE_URL}/api${path}`;
+        console.log(`📡 Sending ${method} to: ${url}`);
+        
         const opts = {
             method,
             headers: { 'Content-Type': 'application/json' },
         };
         if (body) opts.body = JSON.stringify(body);
-        const res = await fetch(`${BASE_URL}${path}`, opts);
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || `Server error ${res.status}`);
-        return json;
+        
+        const res = await fetch(url, opts);
+        
+        // Log the raw response for debugging (Task 4)
+        const text = await res.text();
+        console.log("Raw API response:", text);
+
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            const json = JSON.parse(text);
+            if (!res.ok) throw new Error(json.message || `Server error ${res.status}`);
+            return json;
+        } else {
+            // Server returned HTML or text (likely an error page)
+            if (!res.ok) {
+                console.error("Non-JSON Error:", text.substring(0, 200));
+                throw new Error(`Server returned error ${res.status}. Check backend logs.`);
+            }
+            throw new Error("Server did not return JSON. Check backend configuration.");
+        }
     } catch (err) {
+        console.error("❌ API Request Failed:", err);
+        if (err.name === 'SyntaxError') {
+            throw new Error("Server returned an invalid response (not JSON).");
+        }
         // Network error — backend probably not running
         if (err.name === 'TypeError' && err.message.includes('fetch')) {
-            throw new Error('Laravel Backend server not reachable. Please run: php artisan serve');
+            throw new Error('Connection failed. Backend may be offline.');
         }
         throw err;
     }
@@ -83,5 +106,10 @@ export const apiService = {
     async recordExit() {
         await new Promise(r => setTimeout(r, 800));
         return { success: true, message: 'Exit recorded.' };
+    },
+
+    /* ── Get all visitors for dashboard/logs ────────────────── */
+    async getAllVisitors() {
+        return request('GET', '/visitors');
     },
 };

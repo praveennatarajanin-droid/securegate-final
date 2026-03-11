@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Download, Filter, ClipboardList } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
+import { apiService } from '../services/apiService';
 
 export default function EntryLogs() {
     const { addNotification } = useNotification();
@@ -11,8 +12,7 @@ export default function EntryLogs() {
     React.useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const res = await fetch('/api/visitors');
-                const data = await res.json();
+                const data = await apiService.getAllVisitors();
                 if (data.success) {
                     setLogs(data.data);
                 }

@@ -1,5 +1,6 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const crypto = require('crypto');
 const http = require('http');
@@ -75,7 +76,7 @@ async function initDB() {
             console.log("✅ SQLite Database initialized successfully.");
         }
     } catch (err) {
-        console.warn("⚠️ Database connect failed. Using in-memory fallback. Error:", err.message);
+        console.error("❌ CRITICAL: Database initialization failed:", err.message);
         dbPool = null;
     }
 }
@@ -185,6 +186,7 @@ app.post('/api/internal/status-update', (req, res) => {
 
 // ── POST /api/register ──────────────────────────────
 app.post('/api/register', async (req, res) => {
+    console.log(`[API POST] /register received at ${new Date().toISOString()}`);
     const { name, phone, flat, purpose } = req.body;
     if (!name || !phone || !flat || !purpose) return res.status(400).json({ success: false, message: 'All fields are required.' });
 
@@ -195,11 +197,10 @@ app.post('/api/register', async (req, res) => {
 
     await saveRequest(requestData);
 
-    // Extract the origin IP dynamically if available
-    const host = req.headers.origin ? req.headers.origin.replace('3001', '5173') : 'https://10.100.10.162:5173';
-    const verifyLink = process.env.NODE_ENV === 'production'
-        ? `https://safeentry.netlify.app/resident/${requestId}`
-        : `${host.startsWith('http') ? host : 'https://' + host}/resident/${requestId}`;
+    // Extract the origin dynamically for the verify link
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const currentHost = req.headers.host;
+    const verifyLink = `${protocol}://${currentHost}/resident/${requestId}`;
 
     // Define the recipient
     const recipientEmail = 'vinithkumar78878@gmail.com';
@@ -308,6 +309,12 @@ app.get('/api/visitors', async (req, res) => {
         console.error('Fetch visitors failed:', err.message);
         return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
+});
+
+// ── Serve Frontend ──
+app.use(express.static(path.join(__dirname, '../dist')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 server.listen(PORT, '0.0.0.0', () => {
