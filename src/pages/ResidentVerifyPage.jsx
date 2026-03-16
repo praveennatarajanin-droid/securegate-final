@@ -4,6 +4,7 @@ import { apiService } from '../services/apiService';
 import { ShieldCheck, User, Phone, Home, Briefcase, Clock, Camera, CameraOff, CheckCircle2, XCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { io } from 'socket.io-client';
 import '../styles/resident-verify.css';
+import { useNotification } from '../components/NotificationProvider';
 
 export default function ResidentVerifyPage() {
     const { id } = useParams();
@@ -14,6 +15,7 @@ export default function ResidentVerifyPage() {
     const [processing, setProcessing] = useState(false);
     const [isRejecting, setIsRejecting] = useState(false);
     const [rejectReason, setRejectReason] = useState('Not available at home');
+    const { addNotification } = useNotification();
 
     const videoRef = useRef(null);
     const socketRef = useRef(null);
@@ -136,7 +138,7 @@ export default function ResidentVerifyPage() {
             await apiService.approveVisitor(id);
             // setDecision is handled automatically via socket 'status-update'
         } catch (err) {
-            alert('Error: ' + err.message);
+            addNotification('Error: ' + err.message, 'error');
             setProcessing(false);
         }
     };
@@ -150,7 +152,7 @@ export default function ResidentVerifyPage() {
             await apiService.rejectVisitor(id, rejectReason);
             // setDecision is handled automatically via socket 'status-update'
         } catch (err) {
-            alert('Error: ' + err.message);
+            addNotification('Error: ' + err.message, 'error');
             setProcessing(false);
         }
     };

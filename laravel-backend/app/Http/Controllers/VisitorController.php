@@ -52,6 +52,7 @@ class VisitorController extends Controller
 
             $visitor = VisitorRequest::create([
                 'id' => $requestId,
+                'society_id' => $request->society_id, // Scoped to society
                 'name' => $request->name,
                 'phone' => $request->phone,
                 'flat' => $request->flat,
@@ -59,7 +60,11 @@ class VisitorController extends Controller
                 'timestamp' => $timestamp,
                 'status' => 'waiting',
                 'createdAt' => (int)(microtime(true) * 1000),
+<<<<<<< HEAD
                 'visitor_photo' => $photoPath,
+=======
+                'visitor_photo' => $request->photo,
+>>>>>>> vinith-code
             ]);
 
             // Extract exact frontend IP/port via Referer to avoid Vite Proxy changing 'Origin' to localhost:8000
@@ -233,10 +238,16 @@ class VisitorController extends Controller
         }
     }
 
-    public function getAll()
+    public function getAll(Request $request)
     {
         try {
-            $visitors = VisitorRequest::orderBy('createdAt', 'desc')->get();
+            $query = VisitorRequest::orderBy('created_at', 'desc');
+            
+            if ($request->has('society_id')) {
+                $query->where('society_id', $request->society_id);
+            }
+
+            $visitors = $query->get();
             return response()->json(['success' => true, 'data' => $visitors], 200);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);

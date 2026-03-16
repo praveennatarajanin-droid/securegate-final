@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip as ChartTooltip, Legend, Filler, BarElement, ArcElement } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package, Filter, X, Camera } from 'lucide-react';
+import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 import { apiService } from '../services/apiService';
@@ -17,14 +17,18 @@ export default function Dashboard() {
     const [statusFilter, setStatusFilter] = useState('all');
 
     React.useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const society_id = user.society_id;
+
         const fetchVisitors = async () => {
             try {
-                const data = await apiService.getAllVisitors();
+                const data = await apiService.getAllVisitors(society_id ? { society_id } : {});
                 if (data.success) {
                     setVisitors(data.data);
 
                     // Calculate stats
-                    const statsObj = data.data.reduce((acc, v) => {
+                    const visitorsArr = Array.isArray(data.data) ? data.data : [];
+                    const statsObj = visitorsArr.reduce((acc, v) => {
                         acc.total++;
                         if (v.status === 'waiting') acc.waiting++;
                         else if (v.status === 'approved') acc.approved++;
@@ -62,7 +66,7 @@ export default function Dashboard() {
 
     const handleExport = () => {
         addNotification('Generating Comprehensive CSV Export...', 'loading', 2000);
-        
+
         const headers = ["Visitor", "Phone", "Flat", "Purpose", "Entry Time", "Exit Time", "Status", "Guard"];
         const csvContent = [
             headers.join(','),
@@ -84,22 +88,22 @@ export default function Dashboard() {
         a.href = url;
         a.download = `SecureGate_Summary_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
-        
+
         setTimeout(() => addNotification('Dashboard report exported successfully', 'success'), 2000);
     };
 
     const filteredVisitors = visitors.filter(v => {
         const matchesSearch = v.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             v.flat?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             v.purpose?.toLowerCase().includes(searchQuery.toLowerCase());
-        
+            v.flat?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            v.purpose?.toLowerCase().includes(searchQuery.toLowerCase());
+
         const matchesStatus = statusFilter === 'all' || v.status === statusFilter;
-        
+
         return matchesSearch && matchesStatus;
     });
 
     const chartOptions = {
-        responsive: true, 
+        responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
@@ -121,7 +125,7 @@ export default function Dashboard() {
     };
 
     const blockOptions = {
-        responsive: true, 
+        responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
@@ -237,16 +241,16 @@ export default function Dashboard() {
                 <div className="table-controls" style={{ padding: '1rem 1.5rem', borderBottom: 'none' }}>
                     <div className="search-bar">
                         <Search size={18} color="var(--admin-text-muted)" />
-                        <input 
-                            type="text" 
-                            placeholder="Search for name, flat or purpose..." 
+                        <input
+                            type="text"
+                            placeholder="Search for name, flat or purpose..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                     <div className="actions-group">
-                        <select 
-                            className="btn-secondary" 
+                        <select
+                            className="btn-secondary"
                             style={{ background: 'var(--admin-surface)', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)', boxShadow: 'none', padding: '0.5rem' }}
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
@@ -281,9 +285,9 @@ export default function Dashboard() {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {v.visitor_photo ? (
                                             <div className="visitor-photo-wrapper" style={{ position: 'relative', width: '45px', height: '45px' }}>
-                                                <img 
-                                                    src={v.visitor_photo} 
-                                                    alt="Visitor" 
+                                                <img
+                                                    src={v.visitor_photo}
+                                                    alt="Visitor"
                                                     style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer', border: '1px solid var(--admin-border)' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -291,7 +295,7 @@ export default function Dashboard() {
                                                     }}
                                                     onError={(e) => { e.target.style.display = 'none'; }}
                                                 />
-                                                <button 
+                                                <button
                                                     onClick={async (e) => {
                                                         e.stopPropagation();
                                                         try {
@@ -305,7 +309,7 @@ export default function Dashboard() {
                                                             a.click();
                                                             document.body.removeChild(a);
                                                             setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                                                        } catch(err) {
+                                                        } catch (err) {
                                                             addNotification('Download failed. Try again.', 'error');
                                                         }
                                                     }}
@@ -332,7 +336,7 @@ export default function Dashboard() {
                                     <td><span className="badge badge-primary" style={{ background: '#FFF5F2', color: '#E64B20', borderRadius: '6px' }}>{v.flat}</span></td>
                                     <td>{v.purpose}</td>
                                     <td>
-                                        <span className={`status-badge status-${v.status === 'denied' ? 'rejected' : v.status.toLowerCase()}`}>
+                                        <span className={`status-badge status-${v.status === 'denied' ? 'rejected' : (v.status || '').toLowerCase()}`}>
                                             {v.status === 'approved' ? 'Completed' : v.status === 'denied' ? 'Canceled' : 'On Process'}
                                         </span>
                                     </td>
@@ -358,13 +362,13 @@ export default function Dashboard() {
                             <div className="profile-header">
                                 {selectedVisitor.visitor_photo ? (
                                     <div style={{ position: 'relative' }}>
-                                        <img 
-                                            src={selectedVisitor.visitor_photo} 
-                                            alt={selectedVisitor.name} 
-                                            style={{ width: '100px', height: '100px', borderRadius: '12px', objectFit: 'cover', border: '2px solid var(--admin-border)' }} 
+                                        <img
+                                            src={selectedVisitor.visitor_photo}
+                                            alt={selectedVisitor.name}
+                                            style={{ width: '100px', height: '100px', borderRadius: '12px', objectFit: 'cover', border: '2px solid var(--admin-border)' }}
                                         />
-                                        <button 
-                                            className="action-btn" 
+                                        <button
+                                            className="action-btn"
                                             style={{ position: 'absolute', bottom: '-10px', right: '-10px', background: 'var(--admin-primary)', color: 'white' }}
                                             onClick={() => {
                                                 const link = document.createElement('a');
@@ -411,8 +415,8 @@ export default function Dashboard() {
 
                             {selectedVisitor.visitor_photo && (
                                 <div style={{ marginTop: '1.5rem' }}>
-                                    <button 
-                                        className="btn-secondary" 
+                                    <button
+                                        className="btn-secondary"
                                         style={{ width: '100%', justifyContent: 'center' }}
                                         onClick={() => {
                                             const link = document.createElement('a');

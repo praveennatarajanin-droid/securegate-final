@@ -21,7 +21,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'society_id',
+        'permissions',
+        'invitation_status',
     ];
+
+    public function society()
+    {
+        return $this->belongsTo(Society::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -43,6 +52,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'permissions' => 'array',
         ];
     }
 }

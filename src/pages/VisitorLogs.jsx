@@ -1,30 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Download, Filter, MapPin } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
-
-const sampleVisitors = [
-    { id: 1, name: "Rahul Sharma", phone: "+91 98765 43210", flat: "A-101", purpose: "Delivery", status: "Approved", time: "10:30 AM", host: "Amit Kumar" },
-    { id: 2, name: "Priya Singh", phone: "+91 87654 32109", flat: "B-205", purpose: "Guest", status: "Waiting", time: "11:15 AM", host: "Rohit Sharma" },
-    { id: 3, name: "Suresh Patel", phone: "+91 76543 21098", flat: "C-302", purpose: "Maintenance", status: "Rejected", time: "09:45 AM", host: "Anjali Gupta" },
-    { id: 4, name: "Sneha Reddy", phone: "+91 65432 10987", flat: "A-404", purpose: "Other", status: "Checkout", time: "08:00 AM", host: "Vikram Singh" },
-    { id: 5, name: "Vikram Joshi", phone: "+91 54321 09876", flat: "D-105", purpose: "Delivery", status: "Approved", time: "07:30 AM", host: "Rao Family" },
-];
+import { apiService } from '../services/apiService';
 
 export default function VisitorLogs() {
     const { addNotification } = useNotification();
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [visitors, setVisitors] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const society_id = user.society_id;
+
+        const fetchVisitors = async () => {
+            try {
+                const data = await apiService.getAllVisitors(society_id ? { society_id } : {});
+                if (data.success) {
+                    setVisitors(data.data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch visitor logs:', err);
+                addNotification('Failed to fetch visitor logs.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVisitors();
+    }, []);
 
     const handleExport = () => {
-        addNotification('Generating Visitor Logs PDF...', 'loading', 2500);
+        addNotification('Generating Visitor Logs CSV...', 'loading', 2500);
+        
+        const headers = ["Visitor", "Phone", "Flat", "Purpose", "Status", "Time", "Exit Time"];
+        const csvContent = [
+            headers.join(','),
+            ...visitors.map(v => [
+                `"${v.name}"`,
+                `"${v.phone}"`,
+                `"${v.flat}"`,
+                `"${v.purpose}"`,
+                `"${v.status}"`,
+                `"${v.timestamp}"`,
+                `"${v.exit_time || '-'}"`
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Visitor_Logs_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+
         setTimeout(() => addNotification('Logs exported successfully!', 'success'), 2500);
     };
 
-    const filteredVisitors = sampleVisitors.filter(v =>
-        (v.name.toLowerCase().includes(searchQuery.toLowerCase()) || v.flat.toLowerCase().includes(searchQuery.toLowerCase())) &&
-        (statusFilter === 'All' || v.status === statusFilter)
-    );
+    const filteredVisitors = visitors.filter(v => {
+        const matchesSearch = v.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                             v.flat?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || v.status?.toLowerCase() === statusFilter.toLowerCase();
+        
+        return matchesSearch && matchesStatus;
+    });
 
     return (
         <AdminLayout>
@@ -82,14 +123,18 @@ export default function VisitorLogs() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredVisitors.map(v => (
+                            {loading ? (
+                                <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>Loading visitor logs...</td></tr>
+                            ) : filteredVisitors.length === 0 ? (
+                                <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>No visitor records found.</td></tr>
+                            ) : filteredVisitors.map(v => (
                                 <tr key={v.id}>
                                     <td style={{ fontWeight: 600 }}>{v.name}</td>
                                     <td>{v.phone}</td>
                                     <td><span className="flat-badge">{v.flat}</span></td>
                                     <td>{v.purpose}</td>
-                                    <td><span className={`status-badge status-${v.status.toLowerCase()}`}>{v.status}</span></td>
-                                    <td style={{ color: 'var(--admin-text-muted)' }}>{v.time}</td>
+                                    <td><span className={`status-badge status-${v.status?.toLowerCase()}`}>{v.status}</span></td>
+                                    <td style={{ color: 'var(--admin-text-muted)' }}>{v.timestamp} {v.exit_time && `(Exited: ${v.exit_time})`}</td>
                                 </tr>
                             ))}
                         </tbody>

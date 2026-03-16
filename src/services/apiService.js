@@ -13,15 +13,15 @@ async function request(method, path, body = null) {
     try {
         const url = `${BASE_URL}/api${path}`;
         console.log(`📡 Sending ${method} to: ${url}`);
-        
+
         const opts = {
             method,
             headers: { 'Content-Type': 'application/json' },
         };
         if (body) opts.body = JSON.stringify(body);
-        
+
         const res = await fetch(url, opts);
-        
+
         // Log the raw response for debugging (Task 4)
         const text = await res.text();
         console.log("Raw API response:", text);
@@ -34,10 +34,10 @@ async function request(method, path, body = null) {
         } else {
             // Server returned HTML or text (likely an error page)
             if (!res.ok) {
-                console.error("Non-JSON Error:", text.substring(0, 200));
-                throw new Error(`Server returned error ${res.status}. Check backend logs.`);
+                console.error("Non-JSON Error:", text.substring(0, 500));
+                throw new Error(`Server returned error ${res.status}: ${text.substring(0, 100)}...`);
             }
-            throw new Error("Server did not return JSON. Check backend configuration.");
+            throw new Error("Server did not return JSON. Body: " + text.substring(0, 100));
         }
     } catch (err) {
         console.error("❌ API Request Failed:", err);
@@ -57,12 +57,14 @@ export const apiService = {
        POST /api/register
        Returns { requestId, approvalLink, smsStatus }            */
     async registerVisitor(data) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const society_id = user.society_id || data.society_id;
+
         return request('POST', '/register', {
             name: data.name,
             phone: data.phone,
             flat: data.flat,
             purpose: data.purpose,
-            visitor_photo: data.photo, // Pass the captured base64 photo
         });
     },
 
@@ -113,52 +115,62 @@ export const apiService = {
     },
 
     /* ── Get all visitors for dashboard/logs ────────────────── */
-    async getAllVisitors() {
-        return request('GET', '/visitors');
+    async getAllVisitors(params = {}) {
+        let path = '/visitors';
+        const query = new URLSearchParams(params).toString();
+        if (query) path += `?${query}`;
+        return request('GET', path);
     },
 
-    /* ── Resident Management ─────────────────────────────────── */
-    async getAllResidents() {
-        return request('GET', '/residents');
-    },
-    async addResident(data) {
-        return request('POST', '/residents', data);
-    },
-    async updateResident(id, data) {
-        return request('PUT', `/residents/${id}`, data);
-    },
-    async deleteResident(id) {
-        return request('DELETE', `/residents/${id}`);
+    /* ── Society Management ────────────────────────────────── */
+    async getAllSocieties() {
+        return request('GET', '/societies');
     },
 
-    /* ── Infrastructure Management ───────────────────────────── */
-    async getAllCommunities() {
-        return request('GET', '/communities');
-    },
-    async addCommunity(data) {
-        return request('POST', '/communities', data);
-    },
-    async deleteCommunity(id) {
-        return request('DELETE', `/communities/${id}`);
+    async createSociety(data) {
+        return request('POST', '/societies', data);
     },
 
-    async getAllBlocks() {
-        return request('GET', '/blocks');
-    },
-    async addBlock(data) {
-        return request('POST', '/blocks', data);
-    },
-    async deleteBlock(id) {
-        return request('DELETE', `/blocks/${id}`);
+    async updateSociety(id, data) {
+        return request('PUT', `/societies/${id}`, data);
     },
 
-    async getAllApartments() {
-        return request('GET', '/apartments');
+    async deleteSociety(id) {
+        return request('DELETE', `/societies/${id}`);
     },
-    async addApartment(data) {
-        return request('POST', '/apartments', data);
+
+    /* ── Admin Management ─────────────────────────────────── */
+    async getAllAdmins(params = {}) {
+        let path = '/admins';
+        const query = new URLSearchParams(params).toString();
+        if (query) path += `?${query}`;
+        return request('GET', path);
     },
-    async deleteApartment(id) {
-        return request('DELETE', `/apartments/${id}`);
-    }
+
+    async getAdminAuditLogs(params = {}) {
+        let path = '/audit-logs';
+        const query = new URLSearchParams(params).toString();
+        if (query) path += `?${query}`;
+        return request('GET', path);
+    },
+
+    async createAdmin(data) {
+        return request('POST', '/admins', data);
+    },
+
+    async updateAdmin(id, data) {
+        return request('PUT', `/admins/${id}`, data);
+    },
+
+    async deleteAdmin(id) {
+        return request('DELETE', `/admins/${id}`);
+    },
+
+    async resendAdminInvitation(id, data = {}) {
+        return request('POST', `/admins/${id}/resend-invitation`, data);
+    },
+
+    async bulkAdminAction(data) {
+        return request('POST', '/admins/bulk-action', data);
+    },
 };

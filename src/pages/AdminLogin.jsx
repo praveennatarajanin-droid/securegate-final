@@ -13,7 +13,7 @@ export default function AdminLogin() {
         setErrorLine('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.username || !formData.password) {
             setErrorLine('Please fill in both fields.');
@@ -22,15 +22,37 @@ export default function AdminLogin() {
 
         setIsLoading(true);
 
-        // Simulate authentication
-        setTimeout(() => {
-            if (formData.username === 'admin' && formData.password === 'admin') {
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: formData.username,
+                    password: formData.password
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                if (result.user.role === 'superadmin') {
+                    setErrorLine('Please use the Superadmin Login portal.');
+                    setIsLoading(false);
+                    return;
+                }
+                
+                // Store user info
+                localStorage.setItem('user', JSON.stringify(result.user));
                 navigate('/dashboard');
             } else {
-                setErrorLine('Invalid username or password.');
-                setIsLoading(false);
+                setErrorLine(result.message || 'Invalid username or password.');
             }
-        }, 1200);
+        } catch (error) {
+            console.error('Login error:', error);
+            setErrorLine('Failed to connect to server.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -83,7 +105,27 @@ export default function AdminLogin() {
                         gap: '0.5rem'
                     }}>
                         <AlertCircle size={18} />
-                        {errorLine}
+                        <div>
+                            {errorLine}
+                            {errorLine.includes('Superadmin Login') && (
+                                <div style={{ marginTop: '0.5rem' }}>
+                                    <button 
+                                        onClick={() => navigate('/superadmin/login')}
+                                        style={{ 
+                                            background: 'none', 
+                                            border: 'none', 
+                                            color: '#ef4444', 
+                                            textDecoration: 'underline', 
+                                            cursor: 'pointer',
+                                            fontWeight: 600,
+                                            padding: 0
+                                        }}
+                                    >
+                                        Go to Superadmin Portal
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -91,9 +133,9 @@ export default function AdminLogin() {
                     <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
                         <User size={20} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
                         <input
-                            type="text"
+                            type="email"
                             name="username"
-                            placeholder="Username"
+                            placeholder="Email address"
                             value={formData.username}
                             onChange={handleChange}
                             style={{

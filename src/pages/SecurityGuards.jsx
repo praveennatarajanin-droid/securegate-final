@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, User } from 'lucide-react';
+=======
+import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, XCircle } from 'lucide-react';
+>>>>>>> vinith-code
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 
@@ -17,16 +21,34 @@ export default function SecurityGuards() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentGuard, setCurrentGuard] = useState({ id: null, name: '', phone: '', shift: 'Morning (6AM - 2PM)', gate: 'Main Gate', status: 'Active' });
 
+    // Custom Confirm Modal State
+    const [confirmDialog, setConfirmDialog] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: null,
+        type: 'danger',
+        confirmText: 'Confirm'
+    });
+    const closeConfirmDialog = () => setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+
     const openAddModal = () => {
         setCurrentGuard({ id: Date.now(), name: '', phone: '', shift: 'Morning (6AM - 2PM)', gate: 'Main Gate', status: 'Active' });
         setIsModalOpen(true);
     };
 
     const deleteGuard = (id) => {
-        if (window.confirm('Remove this guard from service?')) {
-            setGuards(guards.filter(g => g.id !== id));
-            addNotification('Guard removed from system', 'success');
-        }
+        setConfirmDialog({
+            isOpen: true,
+            title: 'Remove Guard',
+            message: 'Are you sure you want to remove this guard from service? This action cannot be undone.',
+            type: 'danger',
+            confirmText: 'Remove Guard',
+            onConfirm: () => {
+                setGuards(guards.filter(g => g.id !== id));
+                addNotification('Guard removed from system', 'success');
+            }
+        });
     };
 
     const saveGuard = (e) => {
@@ -173,6 +195,34 @@ export default function SecurityGuards() {
                                 <button type="submit" className="btn-secondary">Save Changes</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Confirm Modal */}
+            {confirmDialog.isOpen && (
+                <div className="modal-overlay" style={{ zIndex: 1100 }}>
+                    <div className="modal-content" style={{ maxWidth: '400px' }}>
+                        <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ margin: 0 }}>{confirmDialog.title}</h3>
+                            <button onClick={closeConfirmDialog} className="action-btn" style={{ padding: 0 }}><XCircle size={20} color="var(--admin-text-muted)" /></button>
+                        </div>
+                        <div className="modal-body">
+                            <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--admin-text)' }}>{confirmDialog.message}</p>
+                        </div>
+                        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--admin-border)' }}>
+                            <button type="button" onClick={closeConfirmDialog} className="btn-secondary">Cancel</button>
+                            <button 
+                                type="button" 
+                                onClick={() => {
+                                    confirmDialog.onConfirm();
+                                    closeConfirmDialog();
+                                }} 
+                                className="btn-primary"
+                                style={confirmDialog.type === 'danger' ? { background: 'var(--admin-error)' } : {}}
+                            >
+                                {confirmDialog.confirmText}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
