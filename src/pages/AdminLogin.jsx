@@ -40,33 +40,33 @@ export default function AdminLogin() {
             justifyContent: 'center',
             minHeight: '100vh',
             width: '100vw',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            background: '#f3f4f6',
             fontFamily: 'Inter, sans-serif'
         }}>
             <div style={{
-                background: 'rgba(30, 41, 59, 0.7)',
+                background: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
                 padding: '3rem 2.5rem',
                 borderRadius: '24px',
                 width: '100%',
                 maxWidth: '420px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                boxShadow: '0 25px 50px -12px rgba(230, 75, 32, 0.3)'
             }}>
 
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
                     <div style={{
                         width: '64px', height: '64px',
-                        background: 'rgba(59, 130, 246, 0.1)',
-                        border: '1px solid rgba(59, 130, 246, 0.2)',
+                        background: '#FFF5F2',
+                        border: '1px solid #FDD8CF',
                         borderRadius: '16px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginBottom: '1rem'
                     }}>
-                        <ShieldCheck size={36} color="#3b82f6" />
+                        <ShieldCheck size={36} color="#FF5C2A" />
                     </div>
-                    <h1 style={{ color: 'white', fontSize: '1.75rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>SecureGate Admin</h1>
-                    <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>Login to access the security dashboard</p>
+                    <h1 style={{ color: '#1a1e26', fontSize: '1.75rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>SecureGate Admin</h1>
+                    <p style={{ color: '#64748b', margin: 0, fontSize: '0.95rem' }}>Login to access the security dashboard</p>
                 </div>
 
                 {errorLine && (
@@ -98,16 +98,16 @@ export default function AdminLogin() {
                             onChange={handleChange}
                             style={{
                                 width: '100%',
-                                background: 'rgba(15, 23, 42, 0.6)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: '#f8fafc',
+                                border: '1px solid #e2e8f0',
                                 padding: '1.25rem 1.25rem 1.25rem 3.25rem',
                                 borderRadius: '12px',
-                                color: 'white',
+                                color: '#1f2937',
                                 fontSize: '1rem',
                                 outline: 'none',
                                 transition: 'border-color 0.2s'
                             }}
-                            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                            onFocus={(e) => e.target.style.borderColor = '#FF5C2A'}
                             onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
                         />
                     </div>
@@ -122,16 +122,16 @@ export default function AdminLogin() {
                             onChange={handleChange}
                             style={{
                                 width: '100%',
-                                background: 'rgba(15, 23, 42, 0.6)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: '#f8fafc',
+                                border: '1px solid #e2e8f0',
                                 padding: '1.25rem 1.25rem 1.25rem 3.25rem',
                                 borderRadius: '12px',
-                                color: 'white',
+                                color: '#1f2937',
                                 fontSize: '1rem',
                                 outline: 'none',
                                 transition: 'border-color 0.2s'
                             }}
-                            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                            onFocus={(e) => e.target.style.borderColor = '#FF5C2A'}
                             onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
                         />
                     </div>
@@ -142,7 +142,7 @@ export default function AdminLogin() {
                         style={{
                             width: '100%',
                             padding: '1.125rem',
-                            background: '#3b82f6',
+                            background: '#FF5C2A',
                             color: 'white',
                             border: 'none',
                             borderRadius: '12px',
@@ -155,8 +155,8 @@ export default function AdminLogin() {
                             gap: '0.75rem',
                             transition: 'background 0.2s, transform 0.2s'
                         }}
-                        onMouseOver={(e) => !isLoading && (e.currentTarget.style.background = '#2563eb')}
-                        onMouseOut={(e) => !isLoading && (e.currentTarget.style.background = '#3b82f6')}
+                        onMouseOver={(e) => !isLoading && (e.currentTarget.style.background = '#FF5C2A')}
+                        onMouseOut={(e) => !isLoading && (e.currentTarget.style.background = '#FF5C2A')}
                         onMouseDown={(e) => !isLoading && (e.currentTarget.style.transform = 'translateY(1px)')}
                         onMouseUp={(e) => !isLoading && (e.currentTarget.style.transform = 'translateY(0)')}
                     >

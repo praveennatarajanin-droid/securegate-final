@@ -30,6 +30,11 @@ export default function VisitorRegistrationForm() {
 
     React.useEffect(() => {
         const startCamera = async () => {
+            if (!window.isSecureContext && window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                window.location.href = window.location.href.replace('http:', 'https:');
+                return;
+            }
+
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 console.error("MediaDevices not supported. Use HTTPS!");
                 addNotification("Camera requires HTTPS. Please ensure the URL starts with https://", "error");
@@ -120,8 +125,22 @@ export default function VisitorRegistrationForm() {
         return true;
     };
 
+    const capturePhoto = () => {
+        if (!videoRef.current) return null;
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', 0.8);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Capture photo first
+        const photoData = capturePhoto();
+        
         const newErrors = {
             name: validate('name', formData.name),
             phone: validate('phone', formData.phone),
@@ -146,6 +165,7 @@ export default function VisitorRegistrationForm() {
         try {
             const payload = {
                 ...formData,
+                photo: photoData, // Add the captured photo
                 purpose: formData.purpose === 'Other' ? formData.customPurpose : formData.purpose
             };
             const response = await apiService.registerVisitor(payload);
@@ -154,15 +174,18 @@ export default function VisitorRegistrationForm() {
             setSubmitSuccess(true);
 
             setTimeout(() => {
-                navigate('/waiting', {
-                    state: {
-                        flat: formData.flat,
-                        requestId: response.data.requestId,
-                        link: response.data.approvalLink,
-                        whatsappUrl: response.data.whatsappUrl
-                    }
+                // Clear form data and reset success state before navigating
+                setFormData({
+                    name: '', phone: '', flat: '', purpose: '', customPurpose: '', photo: null
                 });
-            }, 2500);
+                setTouched({});
+                setErrors({});
+                setSubmitSuccess(false);
+                setIsSubmitting(false);
+                
+                // Navigate to the waiting screen
+                navigate(`/waiting/${response.data.requestId}`, { state: { flat: payload.flat, requestId: response.data.requestId } });
+            }, 3000);
         } catch (err) {
             removeNotification(loadingId);
             addNotification('Failed to send request: ' + (err.message || 'Unknown error'), 'error');
@@ -175,7 +198,6 @@ export default function VisitorRegistrationForm() {
         if (!file) return;
         const reader = new FileReader();
         reader.onloadend = () => {
-            setCapturedImage(reader.result);
             setFormData(prev => ({ ...prev, photo: reader.result }));
             addNotification('Photo captured!', 'success');
         };
@@ -383,32 +405,34 @@ export default function VisitorRegistrationForm() {
                     )}
 
                     {/* ── Tablet Live Camera Preview ── */}
-                    <div className="sg-field">
-                        {!submitSuccess && <label className="sg-label">Live Gate Camera</label>}
-                        <div style={{ position: 'relative', width: '100%', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '180px' }}>
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
-                            <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', display: 'inline-block' }}></span>
-                                LIVE
+                    {!submitSuccess && (
+                        <div className="sg-field">
+                            <label className="sg-label">Live Gate Camera</label>
+                            <div style={{ position: 'relative', width: '100%', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '180px' }}>
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                                <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', display: 'inline-block' }}></span>
+                                    LIVE
+                                </div>
                             </div>
-                        </div>
-                        {!submitSuccess ? (
                             <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px', textAlign: 'center' }}>
                                 This live video will be sent to the resident for verification.
                             </p>
-                        ) : (
-                            <div className="sg-success-badge" style={{ marginTop: '1rem', justifyContent: 'center' }}>
-                                <ShieldCheck size={16} />
-                                Resident Reviewing Your Request
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
+                    {submitSuccess && (
+                        <div className="sg-success-badge" style={{ marginTop: '1rem', justifyContent: 'center' }}>
+                            <ShieldCheck size={16} />
+                            Resident Reviewing Your Request
+                        </div>
+                    )}
 
                     {!submitSuccess && (
                         <>

@@ -54,7 +54,7 @@ export default function Reports() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 <div>
                                     <label className="input-label">Report Type</label>
-                                    <select className="input-field" style={{ border: '1px solid var(--admin-border)' }} value={reportType} onChange={e => setReportType(e.target.value)}>
+                                    <select className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={reportType} onChange={e => setReportType(e.target.value)}>
                                         <option value="daily-visitors">Daily Visitor Traffic</option>
                                         <option value="resident-activity">Resident Entry/Exit Habits</option>
                                         <option value="security-incidents">Security Incident Log</option>
@@ -65,11 +65,11 @@ export default function Reports() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div>
                                         <label className="input-label">Start Date</label>
-                                        <input type="date" className="input-field" style={{ border: '1px solid var(--admin-border)' }} value={startDate} onChange={e => setStartDate(e.target.value)} />
+                                        <input type="date" className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={startDate} onChange={e => setStartDate(e.target.value)} />
                                     </div>
                                     <div>
                                         <label className="input-label">End Date</label>
-                                        <input type="date" className="input-field" style={{ border: '1px solid var(--admin-border)' }} value={endDate} onChange={e => setEndDate(e.target.value)} />
+                                        <input type="date" className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={endDate} onChange={e => setEndDate(e.target.value)} />
                                     </div>
                                 </div>
                             </div>

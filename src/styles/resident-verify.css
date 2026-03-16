@@ -9,22 +9,26 @@
 
 .rv-page {
     min-height: 100vh;
-    background: linear-gradient(160deg, #1e3a5f 0%, #0f172a 100%);
+    background: #f1f5f9; /* Light slate background to make card stand out */
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 0;
+    padding: 1rem;
     font-family: 'Inter', system-ui, sans-serif;
 }
 
 .rv-card {
     width: 100%;
-    max-width: 430px;
+    max-width: 480px; /* Limit width for tablet/desktop */
+    margin: 0 auto;
     background: #ffffff;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 0.5rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding-bottom: 1.5rem;
 }
 
 /* ─── Header ─── */
@@ -33,7 +37,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1.25rem 1.25rem 1rem;
-    background: linear-gradient(135deg, #1e40af, #1d4ed8);
+    background: #FF5C2A;
     color: white;
 }
 
@@ -94,8 +98,8 @@
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    background: #eff6ff;
-    color: #2563eb;
+    background: #FFF5F2;
+    color: #FF5C2A;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -207,9 +211,16 @@
 /* ─── Action buttons ─── */
 .rv-actions {
     display: flex;
+    flex-direction: column; /* Stack buttons on mobile */
     gap: 0.75rem;
-    padding: 1.25rem 1.25rem 0.75rem;
-    margin-top: auto;
+    padding: 1.5rem 1.25rem 0.5rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 400px) {
+    .rv-actions {
+        flex-direction: row; /* Side-by-side on slightly larger screens */
+    }
 }
 
 .rv-btn {
@@ -234,7 +245,7 @@
 }
 
 .rv-btn--approve {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #10b981;
     color: white;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
@@ -249,7 +260,7 @@
 }
 
 .rv-btn--reject {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: #ef4444;
     color: white;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
@@ -289,14 +300,13 @@
 
 .rv-card--error,
 .rv-card--loading {
-    min-height: 100vh;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.5rem;
     color: #6b7280;
     text-align: center;
-    padding: 2rem;
-    background: #f9fafb;
+    padding: 3rem 2rem;
+    background: #ffffff;
 }
 
 .rv-card--error h2 {
@@ -316,20 +326,22 @@
 
 .rv-card--approved,
 .rv-card--denied {
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    text-align: center;
-    padding: 2.5rem 2rem;
+    width: 90%;
+    max-width: 440px;
+    min-height: auto;
+    margin: auto;
+    border-radius: 28px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+    padding: 4rem 2rem;
+    background: #ffffff;
 }
 
 .rv-card--approved {
-    background: linear-gradient(160deg, #f0fdf4, #ecfdf5);
+    background: #ffffff;
 }
 
 .rv-card--denied {
-    background: linear-gradient(160deg, #fff5f5, #fef2f2);
+    background: #ffffff;
 }
 
 .rv-outcome-icon {

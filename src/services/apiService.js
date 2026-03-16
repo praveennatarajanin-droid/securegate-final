@@ -3,7 +3,11 @@
    Falls back gracefully if the server is not running.
    ================================================================ */
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+let BASE_URL = import.meta.env.VITE_API_URL || '';
+// Force relative proxy if local dev network to prevent "localhost" mixed-content blocks on mobile
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('192.')) {
+    BASE_URL = '';
+}
 
 async function request(method, path, body = null) {
     try {
@@ -58,6 +62,7 @@ export const apiService = {
             phone: data.phone,
             flat: data.flat,
             purpose: data.purpose,
+            visitor_photo: data.photo, // Pass the captured base64 photo
         });
     },
 
@@ -103,13 +108,57 @@ export const apiService = {
         return { success: true, message: 'Gate Opened.' };
     },
 
-    async recordExit() {
-        await new Promise(r => setTimeout(r, 800));
-        return { success: true, message: 'Exit recorded.' };
+    async recordExit(requestId) {
+        return request('POST', `/exit/${requestId}`);
     },
 
     /* ── Get all visitors for dashboard/logs ────────────────── */
     async getAllVisitors() {
         return request('GET', '/visitors');
     },
+
+    /* ── Resident Management ─────────────────────────────────── */
+    async getAllResidents() {
+        return request('GET', '/residents');
+    },
+    async addResident(data) {
+        return request('POST', '/residents', data);
+    },
+    async updateResident(id, data) {
+        return request('PUT', `/residents/${id}`, data);
+    },
+    async deleteResident(id) {
+        return request('DELETE', `/residents/${id}`);
+    },
+
+    /* ── Infrastructure Management ───────────────────────────── */
+    async getAllCommunities() {
+        return request('GET', '/communities');
+    },
+    async addCommunity(data) {
+        return request('POST', '/communities', data);
+    },
+    async deleteCommunity(id) {
+        return request('DELETE', `/communities/${id}`);
+    },
+
+    async getAllBlocks() {
+        return request('GET', '/blocks');
+    },
+    async addBlock(data) {
+        return request('POST', '/blocks', data);
+    },
+    async deleteBlock(id) {
+        return request('DELETE', `/blocks/${id}`);
+    },
+
+    async getAllApartments() {
+        return request('GET', '/apartments');
+    },
+    async addApartment(data) {
+        return request('POST', '/apartments', data);
+    },
+    async deleteApartment(id) {
+        return request('DELETE', `/apartments/${id}`);
+    }
 };

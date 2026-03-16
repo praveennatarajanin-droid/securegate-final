@@ -69,7 +69,7 @@ export default function ResidentApprovalPage() {
 
                 {/* Header App Bar */}
                 <div style={{
-                    background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                    background: '#FF5C2A',
                     color: 'white',
                     padding: '2.5rem 1.5rem 1.5rem',
                     display: 'flex',

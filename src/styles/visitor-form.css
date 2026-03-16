@@ -33,7 +33,7 @@
     padding: 1.625rem 1.875rem 2rem;
     box-shadow:
         0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 10px 25px -5px rgba(37, 99, 235, 0.1),
+        0 10px 25px -5px rgba(255, 92, 42, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 1);
     box-sizing: border-box;
     margin: 0 auto;
@@ -90,9 +90,9 @@
 }
 
 .sg-back:hover {
-    background: #eff6ff;
-    border-color: #93c5fd;
-    color: #2563eb;
+    background: #FFF5F2;
+    border-color: #FF5C2A;
+    color: #FF5C2A;
     transform: translateX(-2px);
 }
 
@@ -136,7 +136,7 @@
 
 /* Label turns blue when field is focused */
 .sg-field:focus-within .sg-label {
-    color: #2563eb;
+    color: #FF5C2A;
 }
 
 
@@ -168,9 +168,9 @@
 
 /* Focus glow — triggered when any child (input/select) is focused */
 .sg-input-row:focus-within {
-    border-color: #3b82f6;
+    border-color: #FF5C2A;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    box-shadow: 0 0 0 3px rgba(255, 92, 42, 0.12);
 }
 
 /* Valid state */
@@ -208,7 +208,7 @@
 }
 
 .sg-input-row:focus-within .sg-icon {
-    color: #3b82f6;
+    color: #FF5C2A;
 }
 
 .sg-input-row.field-valid .sg-icon {
@@ -278,7 +278,7 @@
 
 .sg-input-row:focus-within .sg-chevron {
     transform: rotate(180deg);
-    color: #3b82f6;
+    color: #FF5C2A;
 }
 
 /* ── Error message ── */
@@ -329,22 +329,22 @@
 }
 
 .sg-photo:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+    border-color: #FF5C2A;
+    background: #FFF5F2;
     transform: translateY(-1px);
 }
 
 .sg-photo--filled {
     border-style: solid;
-    border-color: #2563eb;
-    background: #eff6ff;
+    border-color: #FF5C2A;
+    background: #FFF5F2;
 }
 
 .sg-photo-icon {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    background: linear-gradient(135deg, #FDD8CF, #FFF5F2);
     border: 1.5px solid #bfdbfe;
     display: flex;
     align-items: center;
@@ -357,7 +357,7 @@
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #2563eb;
+    border: 2px solid #FF5C2A;
     flex-shrink: 0;
     animation: sgScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -412,10 +412,10 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    /* Active: vivid blue gradient */
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    /* Active: vivid orange */
+    background: #FF5C2A;
     color: #ffffff;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.38);
+    box-shadow: 0 4px 14px rgba(255, 92, 42, 0.38);
 }
 
 /* Sheen sweep animation */
@@ -448,13 +448,13 @@
 
 .sg-submit:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 8px 22px rgba(255, 92, 42, 0.45);
+    background: #E64B20;
 }
 
 .sg-submit:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+    box-shadow: 0 3px 10px rgba(255, 92, 42, 0.28);
 }
 
 /* Disabled — form incomplete */
@@ -718,7 +718,7 @@
     border: 1px solid #e2e8f0;
     border-radius: 20px;
     padding: 1.625rem 1.875rem 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(47, 107, 255, 0.07);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(255, 92, 42, 0.07);
     width: 100%;
     box-sizing: border-box;
 }

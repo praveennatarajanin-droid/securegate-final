@@ -2,12 +2,12 @@
 
 :root {
   /* Modern SaaS Dashboard Theme */
-  --color-primary: #2F6BFF;
+  --color-primary: #FF5C2A;
   /* Deep Blue */
-  --color-primary-light: #4F8CFF;
-  --color-primary-dark: #1E4FCC;
+  --color-primary-light: #FF855E;
+  --color-primary-dark: #E64B20;
 
-  --color-secondary: #00B1FF;
+  --color-secondary: #FF8059;
   /* Bright Blue */
 
   --color-success: #10B981;
@@ -49,8 +49,8 @@
   /* Soft Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 25px -5px rgba(47, 107, 255, 0.08), 0 8px 10px -6px rgba(47, 107, 255, 0.04);
-  --shadow-glow: 0 0 15px rgba(47, 107, 255, 0.2);
+  --shadow-lg: 0 10px 25px -5px rgba(255, 92, 42, 0.08), 0 8px 10px -6px rgba(255, 92, 42, 0.04);
+  --shadow-glow: 0 0 15px rgba(255, 92, 42, 0.2);
 }
 
 * {
@@ -164,7 +164,7 @@ select {
 input:focus,
 select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 92, 42, 0.15);
 }
 
 /* Buttons */
@@ -173,7 +173,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--border-radius-md);
@@ -188,7 +188,7 @@ select:focus {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px -3px rgba(47, 107, 255, 0.3);
+  box-shadow: 0 8px 15px -3px rgba(255, 92, 42, 0.3);
 }
 
 .btn:active {
@@ -196,7 +196,7 @@ select:focus {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: var(--color-primary);
 }
 
 .btn-success {
@@ -341,7 +341,7 @@ select:focus {
   margin: 2rem auto;
   position: relative;
   overflow: hidden;
-  background: rgba(47, 107, 255, 0.02);
+  background: rgba(255, 92, 42, 0.02);
 }
 
 .qr-scanner-line {
@@ -394,7 +394,7 @@ select:focus {
 
 .otp-digit:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 92, 42, 0.15);
   transform: translateY(-2px);
 }
 
@@ -426,6 +426,6 @@ select:focus {
 }
 
 .badge-primary {
-  background: rgba(47, 107, 255, 0.1);
+  background: rgba(255, 92, 42, 0.1);
   color: var(--color-primary-dark);
 }
