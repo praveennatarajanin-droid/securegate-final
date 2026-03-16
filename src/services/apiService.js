@@ -62,6 +62,7 @@ export const apiService = {
             phone: data.phone,
             flat: data.flat,
             purpose: data.purpose,
+            visitor_photo: data.photo, // Pass the captured base64 photo
         });
     },
 
@@ -115,4 +116,49 @@ export const apiService = {
     async getAllVisitors() {
         return request('GET', '/visitors');
     },
+
+    /* ── Resident Management ─────────────────────────────────── */
+    async getAllResidents() {
+        return request('GET', '/residents');
+    },
+    async addResident(data) {
+        return request('POST', '/residents', data);
+    },
+    async updateResident(id, data) {
+        return request('PUT', `/residents/${id}`, data);
+    },
+    async deleteResident(id) {
+        return request('DELETE', `/residents/${id}`);
+    },
+
+    /* ── Infrastructure Management ───────────────────────────── */
+    async getAllCommunities() {
+        return request('GET', '/communities');
+    },
+    async addCommunity(data) {
+        return request('POST', '/communities', data);
+    },
+    async deleteCommunity(id) {
+        return request('DELETE', `/communities/${id}`);
+    },
+
+    async getAllBlocks() {
+        return request('GET', '/blocks');
+    },
+    async addBlock(data) {
+        return request('POST', '/blocks', data);
+    },
+    async deleteBlock(id) {
+        return request('DELETE', `/blocks/${id}`);
+    },
+
+    async getAllApartments() {
+        return request('GET', '/apartments');
+    },
+    async addApartment(data) {
+        return request('POST', '/apartments', data);
+    },
+    async deleteApartment(id) {
+        return request('DELETE', `/apartments/${id}`);
+    }
 };

@@ -54,11 +54,23 @@ export default function EntryLogs() {
         setTimeout(() => addNotification('Audit logs exported successfully', 'success'), 2000);
     };
 
-    const downloadPhoto = (photo, name) => {
-        const a = document.createElement('a');
-        a.href = photo;
-        a.download = `Visitor_${name.replace(/\s+/g, '_')}_${new Date().getTime()}.jpg`;
-        a.click();
+    const downloadPhoto = async (photo, name) => {
+        try {
+            // Fetch image as blob so cross-origin download works in all browsers
+            const response = await fetch(photo);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `Visitor_${name.replace(/\s+/g, '_')}_${new Date().getTime()}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        } catch (err) {
+            console.error('Photo download failed:', err);
+            addNotification('Failed to download photo. Try opening it directly.', 'error');
+        }
     };
 
     const filteredLogs = logs.filter(log =>
@@ -81,13 +93,14 @@ export default function EntryLogs() {
                 </div>
 
                 <div className="table-controls" style={{ padding: '1.25rem', borderBottom: '1px solid var(--admin-border)' }}>
-                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)' }}>
+                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)', background: 'var(--admin-surface)' }}>
                         <Search size={18} color="var(--admin-text-muted)" />
                         <input
                             type="text"
                             placeholder="Search by visitor, flat or duty guard..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ background: 'transparent', color: 'var(--admin-text-main)' }}
                         />
                     </div>
                 </div>
@@ -110,14 +123,26 @@ export default function EntryLogs() {
                                 <tr key={log.id}>
                                     <td>
                                         {log.visitor_photo ? (
-                                            <div 
-                                                onClick={() => setPreviewPhoto(log)} 
-                                                style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', border: '2px solid #f3f4f6' }}
-                                            >
-                                                <img src={log.visitor_photo} alt="Visitor" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <div className="visitor-photo-wrapper" style={{ position: 'relative', width: '40px', height: '40px' }}>
+                                                <img 
+                                                    src={log.visitor_photo} 
+                                                    alt="Visitor" 
+                                                    style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer', border: '1px solid var(--admin-border)' }}
+                                                    onClick={() => setPreviewPhoto(log)}
+                                                />
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        downloadPhoto(log.visitor_photo, log.name);
+                                                    }}
+                                                    style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: '#FF5C2A', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+                                                    title="Download Photo"
+                                                >
+                                                    <Download size={10} />
+                                                </button>
                                             </div>
                                         ) : (
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>-</div>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--admin-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--admin-text-muted)' }}>-</div>
                                         )}
                                     </td>
                                     <td style={{ fontWeight: 600 }}>{log.name}</td>
@@ -173,17 +198,17 @@ export default function EntryLogs() {
             {/* Photo Preview Modal */}
             {previewPhoto && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
-                    <div style={{ background: 'white', borderRadius: '16px', overflow: 'hidden', maxWidth: '500px', width: '100%', position: 'relative' }}>
-                        <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>Visitor Identification</h3>
-                            <button onClick={() => setPreviewPhoto(null)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                    <div style={{ background: 'var(--admin-surface)', borderRadius: '16px', overflow: 'hidden', maxWidth: '500px', width: '100%', position: 'relative', border: '1px solid var(--admin-border)' }}>
+                        <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--admin-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, color: 'var(--admin-text-main)' }}>Visitor Identification</h3>
+                            <button onClick={() => setPreviewPhoto(null)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--admin-text-muted)' }}>&times;</button>
                         </div>
                         <div style={{ padding: '1.5rem' }}>
                             <img src={previewPhoto.visitor_photo} alt="Visitor" style={{ width: '100%', borderRadius: '12px', marginBottom: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{previewPhoto.name}</div>
-                                    <div style={{ color: '#64748b', fontSize: '0.875rem' }}>{previewPhoto.flat} • {previewPhoto.timestamp}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--admin-text-main)' }}>{previewPhoto.name}</div>
+                                    <div style={{ color: 'var(--admin-text-muted)', fontSize: '0.875rem' }}>{previewPhoto.flat} • {previewPhoto.timestamp}</div>
                                 </div>
                                 <button 
                                     className="btn-secondary" 

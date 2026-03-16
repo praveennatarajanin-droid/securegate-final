@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ShieldCheck, Loader2, CheckCircle2, XCircle, Camera, CameraOff, Eye, Home, Clock } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { apiService } from '../services/apiService';
@@ -9,9 +9,10 @@ import '../styles/waiting-screen.css';
 export default function ApprovalWaitingScreen() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { id: urlRequestId } = useParams();
 
-    const visitorFlat = location.state?.flat || 'A-101';
-    const requestId = location.state?.requestId;
+    const [visitorFlat, setVisitorFlat] = useState(location.state?.flat || '');
+    const requestId = urlRequestId || location.state?.requestId;
 
     const [status, setStatus] = useState('waiting');
     const [denialReason, setDenialReason] = useState('');
@@ -29,15 +30,55 @@ export default function ApprovalWaitingScreen() {
         return () => clearInterval(id);
     }, []);
 
+    // Fetch visitor details if missing (e.g. on direct navigation or refresh)
+    useEffect(() => {
+        if (requestId && !visitorFlat) {
+            apiService.getRequestDetails(requestId)
+                .then(res => {
+                    if (res.success && res.data) {
+                        setVisitorFlat(res.data.flat);
+                        if (res.data.status === 'approved' || res.data.status === 'denied') {
+                            setStatus(res.data.status);
+                            if (res.data.reason) setDenialReason(res.data.reason);
+                        }
+                    }
+                })
+                .catch(err => console.error("Error fetching request details:", err));
+        }
+    }, [requestId, visitorFlat]);
+
+    // Polling fallback to check status periodically even if socket fails
+    useEffect(() => {
+        if (!requestId || status !== 'waiting') return;
+
+        const pollId = setInterval(async () => {
+            try {
+                const res = await apiService.checkRequestStatus(requestId);
+                if (res.success && (res.status === 'approved' || res.status === 'denied')) {
+                    setStatus(res.status);
+                    if (res.reason) setDenialReason(res.reason);
+                    clearInterval(pollId);
+                }
+            } catch (err) {
+                console.error("Polling error:", err);
+            }
+        }, 3000);
+
+        return () => clearInterval(pollId);
+    }, [requestId, status]);
+
     // Set up WebRTC and Socket
     useEffect(() => {
-        if (!requestId) {
-            const t = setTimeout(() => setStatus('approved'), 8000);
-            return () => clearTimeout(t);
-        }
+        if (!requestId) return;
 
-        const socket = io('/');
+        // Connect via proxy for proper HTTPS/WSS support
+        const socket = io('/', { path: '/socket.io' });
         socketRef.current = socket;
+        console.log("📟 Visitor Socket attempting connection...");
+
+        socket.on('connect', () => console.log("✅ Visitor Socket connected:", socket.id));
+        socket.on('connect_error', (err) => console.error("❌ Visitor Socket error:", err.message));
+
         socket.emit('join-room', requestId);
 
         socket.on('status-update', (data) => {
@@ -75,9 +116,12 @@ export default function ApprovalWaitingScreen() {
                     videoRef.current.srcObject = stream;
                 }
 
-                socket.emit('visitor-ready', requestId);
+                // Announce visitor is ready, retry every 5s in case resident joins late
+                const announceReady = () => socket.emit('visitor-ready', requestId);
+                announceReady();
+                const readyInterval = setInterval(announceReady, 5000);
 
-                socket.on('resident-joined', async () => {
+                const createPeerAndOffer = async () => {
                     if (peerRef.current) peerRef.current.close();
 
                     const peer = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
@@ -94,6 +138,16 @@ export default function ApprovalWaitingScreen() {
                     const offer = await peer.createOffer();
                     await peer.setLocalDescription(offer);
                     socket.emit('offer', { roomId: requestId, offer });
+                };
+
+                socket.on('resident-joined', async () => {
+                    console.log('👤 Resident joined — creating WebRTC offer...');
+                    clearInterval(readyInterval); // Stop broadcasting ready once resident connects
+                    try {
+                        await createPeerAndOffer();
+                    } catch (err) {
+                        console.error('Failed to create offer:', err);
+                    }
                 });
 
                 socket.on('answer', async (answer) => {
@@ -107,6 +161,8 @@ export default function ApprovalWaitingScreen() {
                         try { await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) { }
                     }
                 });
+
+                return () => clearInterval(readyInterval);
 
             } catch (err) {
                 console.error("Camera access failed", err);

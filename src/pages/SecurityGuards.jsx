@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, User } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 
@@ -55,19 +55,20 @@ export default function SecurityGuards() {
                         <h1 className="panel-title">Security Personnel</h1>
                         <p style={{ margin: 0, color: 'var(--admin-text-muted)', fontSize: '0.875rem' }}>Manage security staff and gate assignments.</p>
                     </div>
-                    <button className="btn-primary" onClick={openAddModal}>
+                    <button className="btn-secondary" onClick={openAddModal}>
                         <Plus size={18} /> Add Guard
                     </button>
                 </div>
 
                 <div className="table-controls" style={{ padding: '1.25rem', borderBottom: '1px solid var(--admin-border)' }}>
-                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)' }}>
+                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)', background: 'var(--admin-surface)' }}>
                         <Search size={18} color="var(--admin-text-muted)" />
                         <input
                             type="text"
                             placeholder="Search by guard name or gate..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ background: 'transparent', color: 'var(--admin-text-main)' }}
                         />
                     </div>
                 </div>
@@ -135,16 +136,16 @@ export default function SecurityGuards() {
                             <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <div>
                                     <label className="input-label">Guard Name</label>
-                                    <input className="input-field" style={{ border: '1px solid var(--admin-border)' }} required value={currentGuard.name} onChange={e => setCurrentGuard({ ...currentGuard, name: e.target.value })} />
+                                    <input className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} required value={currentGuard.name} onChange={e => setCurrentGuard({ ...currentGuard, name: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="input-label">Phone Number</label>
-                                    <input className="input-field" style={{ border: '1px solid var(--admin-border)' }} required value={currentGuard.phone} onChange={e => setCurrentGuard({ ...currentGuard, phone: e.target.value })} />
+                                    <input className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} required value={currentGuard.phone} onChange={e => setCurrentGuard({ ...currentGuard, phone: e.target.value })} />
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div>
                                         <label className="input-label">Shift</label>
-                                        <select className="input-field" style={{ border: '1px solid var(--admin-border)' }} value={currentGuard.shift} onChange={e => setCurrentGuard({ ...currentGuard, shift: e.target.value })}>
+                                        <select className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={currentGuard.shift} onChange={e => setCurrentGuard({ ...currentGuard, shift: e.target.value })}>
                                             <option>Morning (6AM - 2PM)</option>
                                             <option>Evening (2PM - 10PM)</option>
                                             <option>Night (10PM - 6AM)</option>
@@ -152,17 +153,24 @@ export default function SecurityGuards() {
                                     </div>
                                     <div>
                                         <label className="input-label">Gate Post</label>
-                                        <select className="input-field" style={{ border: '1px solid var(--admin-border)' }} value={currentGuard.gate} onChange={e => setCurrentGuard({ ...currentGuard, gate: e.target.value })}>
+                                        <select className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={currentGuard.gate} onChange={e => setCurrentGuard({ ...currentGuard, gate: e.target.value })}>
                                             <option>Main Gate</option>
                                             <option>Back Gate</option>
                                             <option>Service Entry</option>
                                         </select>
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="input-label">Service Status</label>
+                                    <select className="input-field" style={{ border: '1px solid var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-main)' }} value={currentGuard.status} onChange={e => setCurrentGuard({ ...currentGuard, status: e.target.value })}>
+                                        <option value="Active">Active Duty</option>
+                                        <option value="On Leave">On Leave</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn-secondary" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                                <button type="submit" className="btn-primary">Save Changes</button>
+                            <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+                                <button type="button" className="btn-secondary" style={{ background: 'transparent', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)' }} onClick={() => setIsModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="btn-secondary">Save Changes</button>
                             </div>
                         </form>
                     </div>

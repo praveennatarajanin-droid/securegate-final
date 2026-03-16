@@ -42,20 +42,20 @@ export default function SecurityAlerts() {
                         </h1>
                         <p style={{ margin: 0, color: 'var(--admin-text-muted)', fontSize: '0.875rem' }}>Priority incidents requiring attention or review.</p>
                     </div>
-                    {/* Fixed: Small and aligned button as requested */}
-                    <button className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }} onClick={() => addNotification('Manual alert system triggered', 'info')}>
+                    <button className="btn-secondary" onClick={() => addNotification('Manual alert system triggered', 'info')}>
                         Add Security Alert
                     </button>
                 </div>
 
                 <div className="table-controls" style={{ padding: '1.25rem', borderBottom: '1px solid var(--admin-border)' }}>
-                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)' }}>
+                    <div className="search-bar" style={{ maxWidth: '400px', border: '1px solid var(--admin-border)', background: 'var(--admin-surface)' }}>
                         <Search size={18} color="var(--admin-text-muted)" />
                         <input
                             type="text"
                             placeholder="Filter by location or message..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ background: 'transparent', color: 'var(--admin-text-main)' }}
                         />
                     </div>
                 </div>

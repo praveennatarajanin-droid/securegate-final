@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     ShieldCheck, Users, Clock, LayoutDashboard,
-    Settings, FileText, ShieldAlert, User, LogOut, X, ChevronLeft, ChevronRight
+    Settings, FileText, ShieldAlert, User, LogOut, X, ChevronLeft, ChevronRight, Building
 } from 'lucide-react';
 
 export default function AdminSidebar({ isCollapsed, isMobileOpen, setCollapsed, setMobileOpen }) {
@@ -43,6 +43,10 @@ export default function AdminSidebar({ isCollapsed, isMobileOpen, setCollapsed, 
                 <Link to="/guards" className={`menu-item ${location.pathname === '/guards' ? 'active' : ''}`} title="Security Guards" onClick={() => setMobileOpen(false)}>
                     <ShieldCheck size={20} className="icon" />
                     {!isCollapsed && <span>Security Guards</span>}
+                </Link>
+                <Link to="/infrastructure" className={`menu-item ${location.pathname === '/infrastructure' ? 'active' : ''}`} title="Infrastructure" onClick={() => setMobileOpen(false)}>
+                    <Building size={20} className="icon" />
+                    {!isCollapsed && <span>Infrastructure</span>}
                 </Link>
                 <Link to="/entry-logs" className={`menu-item ${location.pathname === '/entry-logs' ? 'active' : ''}`} title="Entry Logs" onClick={() => setMobileOpen(false)}>
                     <Clock size={20} className="icon" />

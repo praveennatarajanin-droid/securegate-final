@@ -10,7 +10,6 @@ export default function ResidentVerifyPage() {
 
     const [visitor, setVisitor] = useState(null);
     const [loadError, setLoadError] = useState(null);
-    const [cameraError, setCameraError] = useState(false);
     const [decision, setDecision] = useState(null);
     const [processing, setProcessing] = useState(false);
     const [isRejecting, setIsRejecting] = useState(false);
@@ -33,20 +32,54 @@ export default function ResidentVerifyPage() {
         })();
     }, [id]);
 
+    const [cameraStatus, setCameraStatus] = useState('connecting'); // 'connecting' | 'live' | 'failed'
+    const retryRef = useRef(null);
+
     useEffect(() => {
         if (!visitor || decision) return;
 
-        const socket = io('/');
+        // Connect to Socket.io via Vite proxy for HTTPS support
+        const socket = io('/', { path: '/socket.io' });
         socketRef.current = socket;
+        console.log("📟 Resident Socket attempting connection...");
+
+        socket.on('connect', () => {
+            console.log("✅ Resident Socket connected:", socket.id);
+            socket.emit('join-room', id);
+
+            // Signal resident has joined — retry every 3s for up to 30s
+            // to handle race condition where visitor WebRTC isn't ready yet
+            let retries = 0;
+            const maxRetries = 10;
+            socket.emit('resident-joined', id);
+
+            retryRef.current = setInterval(() => {
+                if (retries >= maxRetries) {
+                    clearInterval(retryRef.current);
+                    // If still not live after retries, mark as failed
+                    setCameraStatus(prev => prev === 'live' ? 'live' : 'failed');
+                    return;
+                }
+                retries++;
+                console.log(`🔄 Retrying resident-joined signal (${retries}/${maxRetries})`);
+                socket.emit('resident-joined', id);
+            }, 3000);
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error("❌ Resident Socket error:", err.message);
+            setCameraStatus('failed');
+        });
 
         const peer = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
         peerRef.current = peer;
 
-        socket.emit('join-room', id);
-
         peer.ontrack = (event) => {
             if (videoRef.current) {
                 videoRef.current.srcObject = event.streams[0];
+                setCameraStatus('live');
+                // Stop retrying once we have the stream
+                if (retryRef.current) clearInterval(retryRef.current);
             }
         };
 
@@ -62,9 +95,11 @@ export default function ResidentVerifyPage() {
                 const answer = await peer.createAnswer();
                 await peer.setLocalDescription(answer);
                 socket.emit('answer', { roomId: id, answer });
+                setCameraStatus('live');
+                if (retryRef.current) clearInterval(retryRef.current);
             } catch (e) {
                 console.error("WebRTC Offer error:", e);
-                setCameraError(true);
+                setCameraStatus('failed');
             }
         });
 
@@ -76,13 +111,11 @@ export default function ResidentVerifyPage() {
             }
         });
 
-        // If the tablet camera is just ready now, we can send our presence again
+        // If the tablet camera becomes ready later
         socket.on('visitor-ready', () => {
+            console.log('📟 Visitor is ready, sending resident-joined');
             socket.emit('resident-joined', id);
         });
-
-        // Trigger the gate tablet to send an offer
-        socket.emit('resident-joined', id);
 
         socket.on('status-update', (data) => {
             if (data.status === 'approved' || data.status === 'denied') {
@@ -91,6 +124,7 @@ export default function ResidentVerifyPage() {
         });
 
         return () => {
+            if (retryRef.current) clearInterval(retryRef.current);
             socket.disconnect();
             peer.close();
         };
@@ -199,18 +233,30 @@ export default function ResidentVerifyPage() {
                     </div>
                 </div>
 
+                {/* Visitor photo removed for privacy - now only visible in Admin Dashboard */}
+
                 <div className="rv-section">
                     <h3 className="rv-section-title">Live Camera at Gate</h3>
                     <div className="rv-camera-frame">
-                        {cameraError ? (
+                        {cameraStatus === 'failed' ? (
                             <div className="rv-camera-error">
                                 <CameraOff size={28} />
-                                <span>Gate Camera connecting... or unavailable</span>
+                                <span>Gate Camera unavailable. Visitor's kiosk may be offline.</span>
                             </div>
                         ) : (
-                            <video ref={videoRef} autoPlay playsInline muted className="rv-video" />
+                            <>
+                                <video ref={videoRef} autoPlay playsInline muted className="rv-video"
+                                    style={{ display: cameraStatus === 'live' ? 'block' : 'none' }} />
+                                {cameraStatus === 'connecting' && (
+                                    <div className="rv-camera-error" style={{ gap: '0.75rem' }}>
+                                        <Loader2 size={32} className="rv-spin" style={{ color: '#FF5C2A' }} />
+                                        <span style={{ color: '#64748b', fontSize: '0.9rem' }}>Connecting to gate camera…</span>
+                                        <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Make sure the visitor is at the kiosk</span>
+                                    </div>
+                                )}
+                            </>
                         )}
-                        {!cameraError && (
+                        {cameraStatus === 'live' && (
                             <div className="rv-live-badge">
                                 <span className="rv-live-dot" />LIVE
                             </div>

@@ -9,9 +9,15 @@ export default defineConfig({
     basicSsl()
   ],
   server: {
+    https: true,
     host: true, // Listen on all network addresses
     proxy: {
       '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/uploads': {
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,

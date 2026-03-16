@@ -11,6 +11,45 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+:root {
+  --admin-primary: #FF5C2A;
+  --admin-bg: #f8fafc;
+  --admin-surface: #ffffff;
+  --admin-surface-hover: #f1f5f9;
+  --admin-border: #e2e8f0;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-error: #ef4444;
+  --admin-success: #10b981;
+  --admin-warning: #f59e0b;
+  --admin-info: #0ea5e3;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --color-primary: #FF5C2A;
+  --color-bg: #F4F4F4;
+  --color-surface: #FFFFFF;
+  --color-text: #1E293B;
+  --color-text-muted: #64748B;
+  --color-border: #e2e8f0;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+}
+
+.dark-mode {
+  --admin-bg: #0f172a;
+  --admin-surface: #1e293b;
+  --admin-surface-hover: #334155;
+  --admin-border: #334155;
+  --admin-text-main: #ffffff;
+  --admin-text-muted: #cbd5e1;
+  --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-text: #ffffff;
+  --color-text-muted: #cbd5e1;
+  --color-border: #334155;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -20,6 +59,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  background-color: var(--admin-bg);
+  color: var(--admin-text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode — scoped to .admin-layout only to avoid breaking visitor pages */
+.dark-mode .admin-layout {
+    color: var(--admin-text-main);
 }
 
 /* Remove Vite default dark-mode button override that was turning buttons grey */

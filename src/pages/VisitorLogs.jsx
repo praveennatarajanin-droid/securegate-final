@@ -42,13 +42,14 @@ export default function VisitorLogs() {
                 </div>
 
                 <div className="table-controls" style={{ padding: '1.25rem', borderBottom: '1px solid var(--admin-border)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    <div className="search-bar" style={{ width: '320px', border: '1px solid var(--admin-border)' }}>
+                    <div className="search-bar" style={{ width: '320px', border: '1px solid var(--admin-border)', background: 'var(--admin-surface)' }}>
                         <Search size={18} color="var(--admin-text-muted)" />
                         <input
                             type="text"
                             placeholder="Search by name, flat..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ background: 'transparent', color: 'var(--admin-text-main)' }}
                         />
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -57,6 +58,7 @@ export default function VisitorLogs() {
                             className="filter-select"
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
+                            style={{ background: 'var(--admin-surface)', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)' }}
                         >
                             <option value="All">All Status</option>
                             <option value="Approved">Approved</option>

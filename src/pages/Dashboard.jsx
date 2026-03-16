@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip as ChartTooltip, Legend, Filler, BarElement, ArcElement } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package } from 'lucide-react';
+import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package, Filter, X, Camera } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 import { apiService } from '../services/apiService';
@@ -98,11 +98,45 @@ export default function Dashboard() {
         return matchesSearch && matchesStatus;
     });
 
+    const chartOptions = {
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'var(--admin-text-muted)'
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: 'var(--admin-text-muted)' },
+                grid: { color: 'var(--admin-border)', tickColor: 'transparent' }
+            },
+            y: {
+                ticks: { color: 'var(--admin-text-muted)' },
+                grid: { color: 'var(--admin-border)', tickColor: 'transparent' }
+            }
+        }
+    };
+
+    const blockOptions = {
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'var(--admin-text-muted)'
+                }
+            }
+        }
+    };
+
     return (
         <AdminLayout>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0' }}>Overview Dashboard</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0', color: 'var(--admin-text-main)' }}>Overview Dashboard</h1>
                     <p style={{ margin: '0.25rem 0 0', color: 'var(--admin-text-muted)', fontSize: '0.875rem' }}>Monitor your real-time security operations.</p>
                 </div>
                 <button className="btn-secondary" onClick={handleExport}>
@@ -184,19 +218,19 @@ export default function Dashboard() {
             <div className="charts-grid" style={{ marginTop: '1.5rem' }}>
                 <div className="panel">
                     <div className="panel-header"><span className="panel-title">Weekly Trends</span></div>
-                    <div className="panel-body" style={{ minHeight: '250px' }}><Line data={trendData} options={{ responsive: true, maintainAspectRatio: false }} /></div>
+                    <div className="panel-body" style={{ minHeight: '250px' }}><Line data={trendData} options={chartOptions} /></div>
                 </div>
                 <div className="panel">
                     <div className="panel-header"><span className="panel-title">Block Traffic</span></div>
-                    <div className="panel-body" style={{ minHeight: '250px' }}><Doughnut data={blockData} options={{ responsive: true, maintainAspectRatio: false }} /></div>
+                    <div className="panel-body" style={{ minHeight: '250px' }}><Doughnut data={blockData} options={blockOptions} /></div>
                 </div>
             </div>
 
             <div className="panel" style={{ marginTop: '1.5rem', borderBottom: 'none' }}>
                 <div className="panel-header" style={{ borderBottom: 'none', paddingBottom: '0.5rem' }}>
                     <div>
-                        <span className="panel-title" style={{ fontSize: '1.25rem' }}>Review all visitor records</span>
-                        <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem' }}>View detailed records of recent entry requests</p>
+                        <span className="panel-title" style={{ fontSize: '1.25rem', color: 'var(--admin-text-main)' }}>Review all visitor records</span>
+                        <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--admin-text-muted)' }}>View detailed records of recent entry requests</p>
                     </div>
                 </div>
 
@@ -213,7 +247,7 @@ export default function Dashboard() {
                     <div className="actions-group">
                         <select 
                             className="btn-secondary" 
-                            style={{ background: 'white', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)', boxShadow: 'none', padding: '0.5rem' }}
+                            style={{ background: 'var(--admin-surface)', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)', boxShadow: 'none', padding: '0.5rem' }}
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                         >
@@ -232,6 +266,7 @@ export default function Dashboard() {
                     <table className="data-table" style={{ borderTop: '1px solid var(--admin-border)' }}>
                         <thead>
                             <tr>
+                                <th>Photo</th>
                                 <th>Visitor ↕</th>
                                 <th>Flat ↕</th>
                                 <th>Purpose ↕</th>
@@ -243,7 +278,57 @@ export default function Dashboard() {
                         <tbody>
                             {filteredVisitors.map(v => (
                                 <tr key={v.id} onClick={() => setSelectedVisitor(v)}>
-                                    <td style={{ fontWeight: 500 }}>{v.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {v.visitor_photo ? (
+                                            <div className="visitor-photo-wrapper" style={{ position: 'relative', width: '45px', height: '45px' }}>
+                                                <img 
+                                                    src={v.visitor_photo} 
+                                                    alt="Visitor" 
+                                                    style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer', border: '1px solid var(--admin-border)' }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedVisitor(v);
+                                                    }}
+                                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                                />
+                                                <button 
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        try {
+                                                            const res = await fetch(v.visitor_photo);
+                                                            const blob = await res.blob();
+                                                            const blobUrl = URL.createObjectURL(blob);
+                                                            const a = document.createElement('a');
+                                                            a.href = blobUrl;
+                                                            a.download = `visitor_${v.id}.jpg`;
+                                                            document.body.appendChild(a);
+                                                            a.click();
+                                                            document.body.removeChild(a);
+                                                            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                                                        } catch(err) {
+                                                            addNotification('Download failed. Try again.', 'error');
+                                                        }
+                                                    }}
+                                                    style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: 'var(--admin-primary)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+                                                    title="Download Photo"
+                                                >
+                                                    <Download size={10} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div style={{ width: '45px', height: '45px', borderRadius: '8px', background: 'var(--admin-bg-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--admin-text-muted)' }}>
+                                                <Camera size={20} />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div className="visitor-cell">
+                                            <div className="visitor-avatar">
+                                                {v.name ? v.name.charAt(0).toUpperCase() : 'V'}
+                                            </div>
+                                            <span style={{ fontWeight: 500 }}>{v.name}</span>
+                                        </div>
+                                    </td>
                                     <td><span className="badge badge-primary" style={{ background: '#FFF5F2', color: '#E64B20', borderRadius: '6px' }}>{v.flat}</span></td>
                                     <td>{v.purpose}</td>
                                     <td>
@@ -259,6 +344,96 @@ export default function Dashboard() {
                     </table>
                 </div>
             </div>
+
+            {selectedVisitor && (
+                <div className="modal-overlay" onClick={() => setSelectedVisitor(null)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+                        <div className="modal-header">
+                            <h3>Visitor Information</h3>
+                            <button className="close-btn" onClick={() => setSelectedVisitor(null)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="profile-header">
+                                {selectedVisitor.visitor_photo ? (
+                                    <div style={{ position: 'relative' }}>
+                                        <img 
+                                            src={selectedVisitor.visitor_photo} 
+                                            alt={selectedVisitor.name} 
+                                            style={{ width: '100px', height: '100px', borderRadius: '12px', objectFit: 'cover', border: '2px solid var(--admin-border)' }} 
+                                        />
+                                        <button 
+                                            className="action-btn" 
+                                            style={{ position: 'absolute', bottom: '-10px', right: '-10px', background: 'var(--admin-primary)', color: 'white' }}
+                                            onClick={() => {
+                                                const link = document.createElement('a');
+                                                link.href = selectedVisitor.visitor_photo;
+                                                link.download = `visitor_${selectedVisitor.id}.jpg`;
+                                                link.click();
+                                            }}
+                                            title="Download Photo"
+                                        >
+                                            <Download size={14} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="profile-avatar-large">
+                                        {selectedVisitor.name ? selectedVisitor.name.charAt(0).toUpperCase() : 'V'}
+                                    </div>
+                                )}
+                                <div className="profile-info">
+                                    <h2>{selectedVisitor.name}</h2>
+                                    <span className={`status-badge status-${selectedVisitor.status === 'denied' ? 'rejected' : selectedVisitor.status.toLowerCase()}`}>
+                                        {selectedVisitor.status === 'approved' ? 'Completed' : selectedVisitor.status === 'denied' ? 'Canceled' : 'On Process'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="info-grid">
+                                <div className="info-block">
+                                    <span className="info-label">Phone</span>
+                                    <span className="info-value">{selectedVisitor.phone}</span>
+                                </div>
+                                <div className="info-block">
+                                    <span className="info-label">Flat No</span>
+                                    <span className="info-value">{selectedVisitor.flat}</span>
+                                </div>
+                                <div className="info-block">
+                                    <span className="info-label">Purpose</span>
+                                    <span className="info-value">{selectedVisitor.purpose}</span>
+                                </div>
+                                <div className="info-block">
+                                    <span className="info-label">Check-in</span>
+                                    <span className="info-value">{selectedVisitor.timestamp}</span>
+                                </div>
+                            </div>
+
+                            {selectedVisitor.visitor_photo && (
+                                <div style={{ marginTop: '1.5rem' }}>
+                                    <button 
+                                        className="btn-secondary" 
+                                        style={{ width: '100%', justifyContent: 'center' }}
+                                        onClick={() => {
+                                            const link = document.createElement('a');
+                                            link.href = selectedVisitor.visitor_photo;
+                                            link.download = `visitor_${selectedVisitor.id}.jpg`;
+                                            link.click();
+                                        }}
+                                    >
+                                        <Download size={18} /> Download Visitor Photo
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', background: 'transparent', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)' }} onClick={() => setSelectedVisitor(null)}>
+                                Close Record
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 }
