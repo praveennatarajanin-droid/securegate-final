@@ -65,6 +65,8 @@ export const apiService = {
             phone: data.phone,
             flat: data.flat,
             purpose: data.purpose,
+            society_id: society_id, // Ensure society_id is sent
+            visitor_photo: data.photo, 
         });
     },
 
@@ -76,9 +78,9 @@ export const apiService = {
     },
 
     /* ── Get visitor details (resident verification page) ───────
-       GET /api/request/:id                                       */
+       GET /api/details/:id                                       */
     async getRequestDetails(requestId) {
-        return request('GET', `/request/${requestId}`);
+        return request('GET', `/details/${requestId}`);
     },
 
     /* ── Resident approves visitor ─────────────────────────────
@@ -91,6 +93,11 @@ export const apiService = {
        POST /api/reject/:id                                       */
     async rejectVisitor(requestId, reason = '') {
         return request('POST', `/reject/${requestId}`, { reason });
+    },
+
+    /* ── Delete visitor record ───────────────────────────────── */
+    async deleteVisitor(requestId) {
+        return request('DELETE', `/visitors/${requestId}`);
     },
 
     /* ── Legacy stubs (kept for other pages) ────────────────── */
@@ -139,6 +146,25 @@ export const apiService = {
         return request('DELETE', `/societies/${id}`);
     },
 
+    /* ── Unit Management ─────────────────────────────────── */
+    async getAllCommunities(societyId) {
+        let path = '/communities';
+        if (societyId) path += `?society_id=${societyId}`;
+        return request('GET', path);
+    },
+
+    async getAllBlocks(societyId) {
+        let path = '/blocks';
+        if (societyId) path += `?society_id=${societyId}`;
+        return request('GET', path);
+    },
+
+    async getAllApartments(societyId) {
+        let path = '/apartments';
+        if (societyId) path += `?society_id=${societyId}`;
+        return request('GET', path);
+    },
+
     /* ── Admin Management ─────────────────────────────────── */
     async getAllAdmins(params = {}) {
         let path = '/admins';
@@ -172,5 +198,35 @@ export const apiService = {
 
     async bulkAdminAction(data) {
         return request('POST', '/admins/bulk-action', data);
+    },
+
+    /* ── Announcement Management ────────────────────────────── */
+    async getActiveAnnouncements() {
+        return request('GET', '/announcements/active');
+    },
+
+    /* ── Resident Management ────────────────────────────────── */
+    async getAllResidents(societyId) {
+        let path = '/residents';
+        if (societyId) path += `?society_id=${societyId}`;
+        return request('GET', path);
+    },
+
+    async addResident(data) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const society_id = user.society_id || data.society_id;
+        
+        return request('POST', '/residents', {
+            ...data,
+            society_id: society_id
+        });
+    },
+
+    async updateResident(id, data) {
+        return request('PUT', `/residents/${id}`, data);
+    },
+
+    async deleteResident(id) {
+        return request('DELETE', `/residents/${id}`);
     },
 };

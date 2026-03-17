@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip as ChartTooltip, Legend, Filler, BarElement, ArcElement } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package } from 'lucide-react';
+import { Users, Clock, CheckCircle, XCircle, Home, ShieldAlert, Zap, CheckSquare, Download, User, Search, Package, Filter, Camera, X, Trash2 } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 import { apiService } from '../services/apiService';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
@@ -15,6 +16,8 @@ export default function Dashboard() {
     const [stats, setStats] = useState({ total: 0, waiting: 0, approved: 0, rejected: 0 });
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+    const [isDeleting, setIsDeleting] = useState(false);
 
     React.useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -46,6 +49,33 @@ export default function Dashboard() {
         const interval = setInterval(fetchVisitors, 5000); // Polling for live updates
         return () => clearInterval(interval);
     }, []);
+
+    const handleDelete = (e, id) => {
+        e.stopPropagation();
+        setDeleteModal({ open: true, id });
+    };
+
+    const confirmDelete = async () => {
+        const id = deleteModal.id;
+        if (!id) return;
+
+        try {
+            setIsDeleting(true);
+            const res = await apiService.deleteVisitor(id);
+            if (res.success) {
+                setVisitors(prev => prev.filter(v => v.id !== id));
+                addNotification('Record deleted successfully', 'success');
+                setDeleteModal({ open: false, id: null });
+            } else {
+                throw new Error(res.message || 'Failed to delete');
+            }
+        } catch (err) {
+            console.error('Delete error:', err);
+            addNotification('Error deleting record: ' + err.message, 'error');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     const trendData = {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -341,7 +371,26 @@ export default function Dashboard() {
                                         </span>
                                     </td>
                                     <td style={{ color: 'var(--admin-text-muted)' }}>{v.timestamp}</td>
-                                    <td style={{ textAlign: 'right', color: 'var(--admin-text-muted)' }}>•••</td>
+                                    <td style={{ textAlign: 'right', color: 'var(--admin-text-muted)' }}>
+                                        <button 
+                                            onClick={(e) => handleDelete(e, v.id)}
+                                            style={{ 
+                                                background: 'transparent', 
+                                                border: 'none', 
+                                                color: '#ef4444', 
+                                                cursor: 'pointer',
+                                                padding: '4px',
+                                                borderRadius: '4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                            className="delete-btn-hover"
+                                            title="Delete Record"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -430,14 +479,31 @@ export default function Dashboard() {
                                 </div>
                             )}
                         </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', background: 'transparent', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)' }} onClick={() => setSelectedVisitor(null)}>
-                                Close Record
+                        <div className="modal-footer" style={{ gap: '1rem' }}>
+                            <button 
+                                className="btn-secondary" 
+                                style={{ flex: 1, justifyContent: 'center', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' }} 
+                                onClick={(e) => {
+                                    handleDelete(e, selectedVisitor.id);
+                                    setSelectedVisitor(null);
+                                }}
+                            >
+                                <Trash2 size={16} /> Delete Record
+                            </button>
+                            <button className="btn-secondary" style={{ flex: 1, justifyContent: 'center', background: 'transparent', color: 'var(--admin-text-main)', border: '1px solid var(--admin-border)' }} onClick={() => setSelectedVisitor(null)}>
+                                Close
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <DeleteConfirmModal 
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null })}
+                onConfirm={confirmDelete}
+                loading={isDeleting}
+            />
         </AdminLayout>
     );
 }

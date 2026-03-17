@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Download, Filter, MapPin } from 'lucide-react';
+import { Search, Download, Filter, MapPin, Camera } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 import { apiService } from '../services/apiService';
@@ -114,6 +114,7 @@ export default function VisitorLogs() {
                     <table className="data-table">
                         <thead>
                             <tr>
+                                <th>Photo</th>
                                 <th>Visitor Name</th>
                                 <th>Phone Number</th>
                                 <th>Flat Number</th>
@@ -129,6 +130,20 @@ export default function VisitorLogs() {
                                 <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>No visitor records found.</td></tr>
                             ) : filteredVisitors.map(v => (
                                 <tr key={v.id}>
+                                    <td>
+                                        {v.visitor_photo ? (
+                                            <img 
+                                                src={v.visitor_photo} 
+                                                alt="Visitor" 
+                                                style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--admin-border)' }}
+                                                onError={(e) => { e.target.style.display = 'none'; }}
+                                            />
+                                        ) : (
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'var(--admin-bg-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--admin-text-muted)' }}>
+                                                <Camera size={16} />
+                                            </div>
+                                        )}
+                                    </td>
                                     <td style={{ fontWeight: 600 }}>{v.name}</td>
                                     <td>{v.phone}</td>
                                     <td><span className="flat-badge">{v.flat}</span></td>

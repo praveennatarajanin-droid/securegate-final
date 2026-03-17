@@ -9,17 +9,22 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SettingsController;
 
 Route::post('/register', [VisitorController::class, 'register']);
-Route::get('/request/{id}', [VisitorController::class, 'getRequest']);
+Route::get('/details/{id}', [VisitorController::class, 'getRequest']);
 Route::get('/status/{id}', [VisitorController::class, 'getStatus']);
 Route::post('/approve/{id}', [VisitorController::class, 'approve']);
 Route::post('/reject/{id}', [VisitorController::class, 'reject']);
 Route::post('/exit/{id}', [VisitorController::class, 'exit']);
 Route::get('/visitors', [VisitorController::class, 'getAll']);
+Route::delete('/visitors/{id}', [VisitorController::class, 'destroy']);
 
 use App\Models\Resident;
 
-Route::get('/residents', function() {
-    return response()->json(['success' => true, 'data' => Resident::all()]);
+Route::get('/residents', function(Illuminate\Http\Request $request) {
+    $query = Resident::query();
+    if ($request->has('society_id')) {
+        $query->where('society_id', $request->society_id);
+    }
+    return response()->json(['success' => true, 'data' => $query->get()]);
 });
 
 Route::post('/residents', function(Illuminate\Http\Request $request) {
@@ -80,8 +85,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
 // Communities
-Route::get('/communities', function() {
-    return response()->json(['success' => true, 'data' => Community::with('blocks.apartments')->get()]);
+Route::get('/communities', function(Illuminate\Http\Request $request) {
+    $query = Community::query();
+    if ($request->has('society_id')) {
+        $query->where('society_id', $request->society_id);
+    }
+    return response()->json(['success' => true, 'data' => $query->with('blocks.apartments')->get()]);
 });
 Route::post('/communities', function(Illuminate\Http\Request $request) {
     return response()->json(['success' => true, 'data' => Community::create($request->all())]);
@@ -92,8 +101,18 @@ Route::delete('/communities/{id}', function($id) {
 });
 
 // Blocks
-Route::get('/blocks', function() {
-    return response()->json(['success' => true, 'data' => Block::with('apartments')->get()]);
+Route::get('/blocks', function(Illuminate\Http\Request $request) {
+    $societyId = $request->society_id;
+    \Illuminate\Support\Facades\Log::info("Fetching blocks for society_id: " . ($societyId ?? 'none'));
+    
+    $query = Block::query();
+    if ($societyId) {
+        $query->where('society_id', $societyId);
+    }
+    $blocks = $query->with('apartments')->get();
+    \Illuminate\Support\Facades\Log::info("Found " . $blocks->count() . " blocks");
+    
+    return response()->json(['success' => true, 'data' => $blocks]);
 });
 Route::post('/blocks', function(Illuminate\Http\Request $request) {
     return response()->json(['success' => true, 'data' => Block::create($request->all())]);
@@ -104,8 +123,12 @@ Route::delete('/blocks/{id}', function($id) {
 });
 
 // Apartments
-Route::get('/apartments', function() {
-    return response()->json(['success' => true, 'data' => Apartment::all()]);
+Route::get('/apartments', function(Illuminate\Http\Request $request) {
+    $query = Apartment::query();
+    if ($request->has('society_id')) {
+        $query->where('society_id', $request->society_id);
+    }
+    return response()->json(['success' => true, 'data' => $query->get()]);
 });
 Route::post('/apartments', function(Illuminate\Http\Request $request) {
     return response()->json(['success' => true, 'data' => Apartment::create($request->all())]);

@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, User } from 'lucide-react';
-=======
-import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, XCircle } from 'lucide-react';
->>>>>>> vinith-code
+import { Search, Plus, Edit, Trash2, ShieldCheck, Phone, MapPin, User, XCircle } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 
@@ -211,12 +207,12 @@ export default function SecurityGuards() {
                         </div>
                         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--admin-border)' }}>
                             <button type="button" onClick={closeConfirmDialog} className="btn-secondary">Cancel</button>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={() => {
                                     confirmDialog.onConfirm();
                                     closeConfirmDialog();
-                                }} 
+                                }}
                                 className="btn-primary"
                                 style={confirmDialog.type === 'danger' ? { background: 'var(--admin-error)' } : {}}
                             >

@@ -11,9 +11,12 @@ export default function EntryLogs() {
     const [previewPhoto, setPreviewPhoto] = useState(null);
 
     React.useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const society_id = user.society_id;
+
         const fetchLogs = async () => {
             try {
-                const data = await apiService.getAllVisitors();
+                const data = await apiService.getAllVisitors(society_id ? { society_id } : {});
                 if (data.success) {
                     setLogs(data.data);
                 }

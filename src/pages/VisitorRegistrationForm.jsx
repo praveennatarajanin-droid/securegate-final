@@ -5,7 +5,7 @@ import { apiService } from '../services/apiService';
 import {
     ChevronLeft, Send, User, Phone, Home, Briefcase,
     Camera, ShieldCheck, CheckCircle2, AlertCircle,
-    Loader2, ChevronDown, Lock
+    Loader2, ChevronDown, Lock, Settings
 } from 'lucide-react';
 import '../styles/visitor-form.css';
 
@@ -14,8 +14,12 @@ export default function VisitorRegistrationForm() {
     const { addNotification, removeNotification } = useNotification();
 
     const [formData, setFormData] = useState({
-        name: '', phone: '', flat: '', purpose: '', customPurpose: '', photo: null
+        name: '', phone: '', flat: '', purpose: '', customPurpose: '', photo: null, block: ''
     });
+    const [blocks, setBlocks] = useState([]);
+    const [apartments, setApartments] = useState([]);
+    const [loadingUnits, setLoadingUnits] = useState(false);
+    const [kioskSocietyId, setKioskSocietyId] = useState(localStorage.getItem('kiosk_society_id') || 1);
     const [touched, setTouched] = useState({});
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,6 +31,38 @@ export default function VisitorRegistrationForm() {
     const phoneRef = useRef(null);
     const flatRef = useRef(null);
     const purposeRef = useRef(null);
+
+    React.useEffect(() => {
+        const fetchUnitData = async () => {
+            setLoadingUnits(true);
+            try {
+                const response = await apiService.getAllBlocks(kioskSocietyId);
+                if (response.success) {
+                    setBlocks(response.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch units", err);
+            } finally {
+                setLoadingUnits(false);
+            }
+        };
+        fetchUnitData();
+    }, [kioskSocietyId]);
+
+    React.useEffect(() => {
+        if (formData.block) {
+            const block = blocks.find(b => b.name === formData.block);
+            if (block && block.apartments) {
+                setApartments(block.apartments);
+                // Auto-select first apartment if current selection is invalid
+                if (!block.apartments.some(a => a.number === formData.flat)) {
+                    setFormData(prev => ({ ...prev, flat: block.apartments[0]?.number || '' }));
+                }
+            } else {
+                setApartments([]);
+            }
+        }
+    }, [formData.block, blocks]);
 
     React.useEffect(() => {
         const startCamera = async () => {
@@ -87,8 +123,10 @@ export default function VisitorRegistrationForm() {
                 if (!/^\d{10}$/.test(value)) return 'Exactly 10 digits required';
                 return '';
             case 'flat':
-                if (!value.trim()) return 'Flat / House number is required';
-                if (value.trim().length < 2) return 'E.g. A-101 or B-205';
+                if (!value.trim()) return 'Unit number is required';
+                return '';
+            case 'block':
+                if (!value) return 'Please select a block';
                 return '';
             case 'purpose':
                 if (!value) return 'Please select a purpose';
@@ -115,6 +153,7 @@ export default function VisitorRegistrationForm() {
     const isFormValid = () => {
         const baseValid = formData.name && !validate('name', formData.name) &&
             formData.phone && !validate('phone', formData.phone) &&
+            formData.block && !validate('block', formData.block) &&
             formData.flat && !validate('flat', formData.flat) &&
             formData.purpose && !validate('purpose', formData.purpose);
 
@@ -144,6 +183,7 @@ export default function VisitorRegistrationForm() {
         const newErrors = {
             name: validate('name', formData.name),
             phone: validate('phone', formData.phone),
+            block: validate('block', formData.block),
             flat: validate('flat', formData.flat),
             purpose: validate('purpose', formData.purpose),
         };
@@ -165,7 +205,8 @@ export default function VisitorRegistrationForm() {
         try {
             const payload = {
                 ...formData,
-                photo: photoData, // Add the captured photo
+                photo: photoData, 
+                society_id: kioskSocietyId,
                 purpose: formData.purpose === 'Other' ? formData.customPurpose : formData.purpose
             };
             const response = await apiService.registerVisitor(payload);
@@ -250,6 +291,18 @@ export default function VisitorRegistrationForm() {
                 <form onSubmit={handleSubmit} noValidate>
 
                     <div style={{ display: submitSuccess ? 'none' : 'block' }}>
+                        {/* ── Settings Link (Subtle) ── */}
+                        <div style={{ position: 'fixed', bottom: 10, right: 10, zIndex: 10, opacity: 0.3 }}>
+                            <button 
+                                type="button"
+                                onClick={() => navigate('/kiosk/setup')}
+                                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}
+                                aria-label="Setup"
+                            >
+                                <Settings size={14} />
+                            </button>
+                        </div>
+
                         {/* ── Visitor Name ── */}
                         <div className="sg-field">
                             <label className="sg-label">Visitor Full Name</label>
@@ -304,30 +357,50 @@ export default function VisitorRegistrationForm() {
                             )}
                         </div>
 
-                        {/* ── Flat / House Number ── */}
-                        <div className="sg-field">
-                            <label className="sg-label">Flat / House Number</label>
-                            <div className={`sg-input-row ${wrapperState('flat')}`}>
-                                <span className="sg-icon"><Home size={18} /></span>
-                                <input
-                                    ref={flatRef}
-                                    type="text"
-                                    name="flat"
-                                    className="sg-input"
-                                    value={formData.flat}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    placeholder="e.g. A-101 or B-205"
-                                    autoComplete="off"
-                                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), purposeRef.current?.focus())}
-                                />
-                                <span className="sg-status"><StatusIcon field="flat" /></span>
+                        {/* ── Block & Unit Selection ── */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                            <div className="sg-field">
+                                <label className="sg-label">Select Block</label>
+                                <div className={`sg-input-row ${wrapperState('block')}`}>
+                                    <span className="sg-icon"><Home size={18} /></span>
+                                    <select
+                                        name="block"
+                                        className="sg-input"
+                                        value={formData.block}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        style={{ appearance: 'none' }}
+                                    >
+                                        <option value="">Block</option>
+                                        {blocks.map(b => (
+                                            <option key={b.id} value={b.name}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                    <span className="sg-status"><ChevronDown size={14} color="var(--sg-text-muted)" /></span>
+                                </div>
                             </div>
-                            {touched.flat && errors.flat && (
-                                <span className="sg-error">
-                                    <AlertCircle size={12} />{errors.flat}
-                                </span>
-                            )}
+
+                            <div className="sg-field">
+                                <label className="sg-label">Unit Number</label>
+                                <div className={`sg-input-row ${wrapperState('flat')}`}>
+                                    <span className="sg-icon"><ShieldCheck size={18} /></span>
+                                    <select
+                                        name="flat"
+                                        className="sg-input"
+                                        value={formData.flat}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        disabled={!formData.block}
+                                        style={{ appearance: 'none' }}
+                                    >
+                                        <option value="">{formData.block ? 'Select Unit' : 'Wait...'}</option>
+                                        {apartments.map(a => (
+                                            <option key={a.id} value={a.number}>{a.number}</option>
+                                        ))}
+                                    </select>
+                                    <span className="sg-status"><ChevronDown size={14} color="var(--sg-text-muted)" /></span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* ── Purpose of Visit ── */}

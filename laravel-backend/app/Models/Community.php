@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Community extends Model
 {
-    protected $fillable = ['name', 'address', 'city', 'state', 'zip'];
+    protected $fillable = ['society_id', 'name', 'address', 'city', 'state', 'zip'];
 
     public function blocks()
     {

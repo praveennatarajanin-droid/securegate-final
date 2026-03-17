@@ -48,7 +48,7 @@ class UserAccountCreated extends Mailable
                 <p><strong>Password:</strong> {$this->password}</p>
                 <br/>
                 <p>Please login using the link below:</p>
-                <a href=\"".env('FRONTEND_URL')."/login\" style=\"background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">Login to SecureGate</a>
+                <a href=\"".env('FRONTEND_URL', 'http://localhost:5173')."/admin-login\" style=\"background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">Login to SecureGate</a>
             ",
         );
     }

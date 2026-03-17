@@ -60,12 +60,9 @@ class VisitorController extends Controller
                 'timestamp' => $timestamp,
                 'status' => 'waiting',
                 'createdAt' => (int)(microtime(true) * 1000),
-<<<<<<< HEAD
                 'visitor_photo' => $photoPath,
-=======
-                'visitor_photo' => $request->photo,
->>>>>>> vinith-code
             ]);
+            \Log::info("💾 Visitor request saved with ID: " . $requestId);
 
             // Extract exact frontend IP/port via Referer to avoid Vite Proxy changing 'Origin' to localhost:8000
             $referer = $request->header('referer');
@@ -76,9 +73,9 @@ class VisitorController extends Controller
                     $host = $parsed['host'];
                     $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
                     
-                    // If accessed via localhost, forcefully change to current network IP for mobile testing
+                    // If accessed via localhost, use the configured FRONTEND_URL or current host
                     if ($host === 'localhost' || $host === '127.0.0.1') {
-                        $frontendUrl = env('FRONTEND_URL', 'https://10.100.10.30:5173'); 
+                        $frontendUrl = config('app.frontend_url', 'https://10.100.10.63:5173'); 
                     } else {
                         // Force HTTPS for all mobile/network requests to ensure camera API and secure links work
                         $frontendUrl = 'https://' . $host . $port;
@@ -88,7 +85,7 @@ class VisitorController extends Controller
             
             // Fallback securely to the stored network address if referer is missing
             if (empty($frontendUrl)) {
-                $frontendUrl = env('FRONTEND_URL', 'https://10.100.10.30:5173'); 
+                $frontendUrl = config('app.frontend_url', 'https://10.100.10.63:5173'); 
             }
 
             $verifyLink = $frontendUrl . "/resident/" . $requestId;
@@ -154,12 +151,21 @@ class VisitorController extends Controller
     public function getRequest($id)
     {
         try {
+            \Log::info("🔍 Incoming getRequest for ID: [" . $id . "] (Length: " . strlen($id) . ")");
+            
+            // Debug: List all IDs in the table to see what's there
+            $allIds = \App\Models\VisitorRequest::pluck('id')->toArray();
+            \Log::info("📋 IDs currently in DB: " . implode(', ', $allIds));
+
             $request = VisitorRequest::find($id);
             if (!$request) {
+                \Log::warning("❌ Visitor request not found for ID: [" . $id . "]");
                 return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
             }
+            \Log::info("✅ Found request for: " . $request->name);
             return response()->json(['success' => true, 'data' => $request]);
         } catch (\Exception $e) {
+            \Log::error("🔥 Error in getRequest: " . $e->getMessage());
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
@@ -267,6 +273,26 @@ class VisitorController extends Controller
             ]);
 
             return response()->json(['success' => true, 'message' => 'Exit recorded.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function destroy($id)
+    {
+        try {
+            $request = VisitorRequest::find($id);
+            if (!$request) {
+                return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+            }
+
+            // Optionally delete associated photo
+            if ($request->visitor_photo && file_exists(public_path($request->visitor_photo))) {
+                unlink(public_path($request->visitor_photo));
+            }
+
+            $request->delete();
+
+            return response()->json(['success' => true, 'message' => 'Visitor record deleted.'], 200);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }

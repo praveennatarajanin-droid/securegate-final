@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Building, Layers, Home } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import { useNotification } from '../components/NotificationProvider';
 import { apiService } from '../services/apiService';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 export default function InfrastructureSettings() {
     const { addNotification, removeNotification } = useNotification();
@@ -12,6 +13,8 @@ export default function InfrastructureSettings() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalData, setModalData] = useState({ type: 'community', mode: 'add', current: null });
     const [formData, setFormData] = useState({ name: '', address: '', city: '', state: '', zip: '', community_id: '', block_id: '', number: '' });
+    const [deleteModal, setDeleteModal] = useState({ open: false, type: '', id: null });
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchCommunities = async () => {
         try {
@@ -42,16 +45,26 @@ export default function InfrastructureSettings() {
         setIsModalOpen(true);
     };
 
-    const handleDelete = async (type, id) => {
-        if (!window.confirm(`Delete this ${type}?`)) return;
+    const handleDelete = (type, id) => {
+        setDeleteModal({ open: true, type, id });
+    };
+
+    const confirmDelete = async () => {
+        const { type, id } = deleteModal;
+        if (!id) return;
+
         try {
+            setIsDeleting(true);
             if (type === 'community') await apiService.deleteCommunity(id);
             if (type === 'block') await apiService.deleteBlock(id);
             if (type === 'apartment') await apiService.deleteApartment(id);
             addNotification(`${type} deleted.`, 'success');
+            setDeleteModal({ open: false, type: '', id: null });
             fetchCommunities();
         } catch (err) {
             addNotification(`Failed to delete ${type}.`, 'error');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -193,6 +206,15 @@ export default function InfrastructureSettings() {
                     </div>
                 </div>
             )}
+
+            <DeleteConfirmModal 
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, type: '', id: null })}
+                onConfirm={confirmDelete}
+                loading={isDeleting}
+                title={`Delete ${deleteModal.type.charAt(0).toUpperCase() + deleteModal.type.slice(1)}?`}
+                message={`Are you sure you want to permanently delete this ${deleteModal.type}? All associated data will be removed.`}
+            />
         </AdminLayout>
     );
 }

@@ -22,6 +22,7 @@ import Reports from './pages/Reports';
 import SecurityAlerts from './pages/SecurityAlerts';
 import SystemSettings from './pages/SystemSettings';
 import InfrastructureSettings from './pages/InfrastructureSettings';
+import KioskSetup from './pages/KioskSetup';
 
 // Superadmin Pages
 import SuperadminDashboard from './pages/superadmin/SuperadminDashboard';
@@ -74,6 +75,7 @@ function App() {
           <Route path="/waiting/:id" element={<KioskLayout><ApprovalWaitingScreen /></KioskLayout>} />
           <Route path="/auth" element={<KioskLayout><AuthScreen /></KioskLayout>} />
           <Route path="/exit" element={<KioskLayout><ExitScreen /></KioskLayout>} />
+          <Route path="/kiosk/setup" element={<KioskSetup />} />
 
           {/* Resident verification — opened via WhatsApp link */}
           <Route path="/resident/:id" element={<ResidentVerifyPage />} />
