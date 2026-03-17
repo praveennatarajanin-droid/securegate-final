@@ -21,8 +21,6 @@ import EntryLogs from './pages/EntryLogs';
 import Reports from './pages/Reports';
 import SecurityAlerts from './pages/SecurityAlerts';
 import SystemSettings from './pages/SystemSettings';
-import InfrastructureSettings from './pages/InfrastructureSettings';
-import KioskSetup from './pages/KioskSetup';
 
 // Superadmin Pages
 import SuperadminDashboard from './pages/superadmin/SuperadminDashboard';
@@ -72,10 +70,9 @@ function App() {
         <Routes>
           <Route path="/" element={<WelcomeScreen />} />
           <Route path="/register" element={<KioskLayout><VisitorRegistrationForm /></KioskLayout>} />
-          <Route path="/waiting/:id" element={<KioskLayout><ApprovalWaitingScreen /></KioskLayout>} />
+          <Route path="/waiting" element={<KioskLayout><ApprovalWaitingScreen /></KioskLayout>} />
           <Route path="/auth" element={<KioskLayout><AuthScreen /></KioskLayout>} />
           <Route path="/exit" element={<KioskLayout><ExitScreen /></KioskLayout>} />
-          <Route path="/kiosk/setup" element={<KioskSetup />} />
 
           {/* Resident verification — opened via WhatsApp link */}
           <Route path="/resident/:id" element={<ResidentVerifyPage />} />
@@ -95,7 +92,6 @@ function App() {
           <Route path="/guards" element={<SecurityGuards />} />
           <Route path="/entry-logs" element={<EntryLogs />} />
           <Route path="/reports" element={<Reports />} />
-          <Route path="/infrastructure" element={<InfrastructureSettings />} />
           <Route path="/settings" element={<SystemSettings />} />
 
           {/* Superadmin Routes */}
